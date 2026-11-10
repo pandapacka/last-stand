@@ -95,7 +95,13 @@ header{padding:7px 10px!important}header h1{font-size:17px!important;margin:0!im
 #world .mapnode.locked{opacity:.8}
 #world .siteinfo{margin:8px 0}
 #world .worldmap .worldhud{position:absolute;top:8px;left:8px;z-index:4;padding:7px 10px;border-radius:8px;background:#172b22d9;color:#f1e6c8;font-size:12px;pointer-events:none}
-</style></head><body><div class="wrap"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Версия 0.13 · Изометрический мир · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><div class="stat">🥫 Еда <b id="food">120</b></div><div class="stat">🪵 Материалы <b id="wood">160</b></div><div class="stat">⚙️ Металл <b id="metal">90</b></div><div class="stat">👥 Люди <b id="people">12</b></div><div class="stat">❤️ База <b id="hp">100</b></div></div><nav class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
+</style><style id="world14">
+#world .worldcontrols{position:absolute;right:8px;top:8px;z-index:5;display:flex;flex-direction:column;gap:6px}
+#world .worldcontrols button{width:39px;height:39px;border:1px solid #b7b08b;border-radius:9px;background:#1b3329e8;color:#f4e5c2;font-size:23px}
+#world .worldlegend{position:absolute;bottom:8px;left:8px;z-index:4;background:#162b22e8;color:#e5dfc8;border-radius:8px;padding:7px;font-size:10px;pointer-events:none}
+#world .worldmap .worldhud{right:57px;left:8px;width:max-content;max-width:calc(100% - 75px)}
+#world .siteinfo{border-left:4px solid #d6b56b}
+</style></head><body><div class="wrap"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Версия 0.14 · Маршруты мира · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><div class="stat">🥫 Еда <b id="food">120</b></div><div class="stat">🪵 Материалы <b id="wood">160</b></div><div class="stat">⚙️ Металл <b id="metal">90</b></div><div class="stat">👥 Люди <b id="people">12</b></div><div class="stat">❤️ База <b id="hp">100</b></div></div><nav class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
 <h2>🌾 Земледелие · опытная версия</h2>
 <div class="info">Каждая ферма даёт 4 грядки. Посадка расходует семена, рост занимает игровые дни. Урожай собирается вручную или автоматически при назначении агронома.</div>
 <div class="agrow"><label>Культура <select id="cropSelect"></select></label><label>Агроном <select id="farmerSelect"></select></label></div>
@@ -502,6 +508,20 @@ function worldCanvasDraw(){
    c.fillStyle='#737466';c.beginPath();c.moveTo(px-8*worldScale,py-bh);c.lineTo(px,py-bh-5*worldScale);c.lineTo(px+8*worldScale,py-bh);c.lineTo(px,py-bh+4*worldScale);c.fill();
   }
  }
+
+ // Threat zones and selected route are rendered beneath interactive landmarks.
+ function ellipse(cx,cy,rx,ry,color){const [px,py]=pt(cx,cy);c.beginPath();c.ellipse(px,py,rx*tw,ry*th,0,0,Math.PI*2);c.fillStyle=color;c.fill()}
+ ellipse(7,4,4.5,6,'#aa43302b');
+ ellipse(8,-7,3,4,'#a3444036');
+ ellipse(-8,7,3,4,'#c9a94c19');
+ const home=sites.home,selected=sites[activeSite];
+ if(selected&&activeSite!=='home'&&state.world.discovered.includes(activeSite)){
+  const from=pt((home.x-50)/4,(home.y-50)/4),to=pt((selected.x-50)/4,(selected.y-50)/4);
+  const mid=[(from[0]+to[0])/2,(from[1]+to[1])/2-17*worldScale];
+  c.beginPath();c.moveTo(...from);c.quadraticCurveTo(...mid,...to);
+  c.setLineDash([8*worldScale,5*worldScale]);c.strokeStyle='#f3d58e';c.lineWidth=3*worldScale;c.stroke();c.setLineDash([]);
+  c.beginPath();c.arc(to[0],to[1],8*worldScale,0,Math.PI*2);c.strokeStyle='#f8d27d';c.lineWidth=2;c.stroke();
+ }
  // Landmark nodes use the same projected plane as the terrain.
  for(const [id,site] of Object.entries(sites)){
   const node=el.querySelector('[data-site="'+id+'"]');if(!node)continue;
@@ -515,7 +535,15 @@ renderWorld=function(){
  worldRenderBefore13();
  const map=document.getElementById('worldmap');
  const canvas=document.createElement('canvas');canvas.setAttribute('aria-hidden','true');map.prepend(canvas);
- const hud=document.createElement('div');hud.className='worldhud';hud.textContent='🌍 Окрестности · перемещай карту пальцем';map.append(hud);
+ const hud=document.createElement('div');hud.className='worldhud';hud.textContent='🌍 Окрестности · '+(sites[activeSite]?.name||'Исследование');map.append(hud);
+ const controls=document.createElement('div');controls.className='worldcontrols';
+ for(const [label,delta] of [['+',.2],['−',-.2]]){
+  const button=document.createElement('button');button.textContent=label;button.title=delta>0?'Приблизить':'Отдалить';
+  button.onclick=()=>{worldScale=Math.max(.6,Math.min(2.3,worldScale+delta));worldCanvasDraw()};
+  controls.append(button);
+ }
+ const reset=document.createElement('button');reset.textContent='⌖';reset.title='Центрировать карту';reset.onclick=()=>{worldScale=1;worldPan={x:0,y:0};worldCanvasDraw()};controls.append(reset);map.append(controls);
+ const legend=document.createElement('div');legend.className='worldlegend';legend.textContent='🟡 Маршрут  ·  🔴 Опасная зона  ·  🌲 Дикая местность';map.append(legend);
  Object.keys(sites).forEach((id,i)=>{const node=map.querySelectorAll('.mapnode')[i];if(node)node.dataset.site=id});
  worldCanvasDraw();
 };
