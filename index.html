@@ -81,7 +81,21 @@ header{padding:7px 10px!important}header h1{font-size:17px!important;margin:0!im
 #kitchenScreen .kupgradebutton{display:block;width:100%;padding:14px;border:0;border-radius:10px;background:#b99b5b;color:#17261c;font-weight:700}
 #kitchenScreen .kupgradebutton:disabled{background:#526252;color:#b7c0b2}
 #kitchenScreen .kqueueitem{margin:9px 0;padding:9px;background:#344b3b;border-radius:8px}#kitchenScreen .kqueueitem progress{display:block;width:100%;height:12px;margin-top:6px;accent-color:#d2ac66}#kitchenScreen .kfoot{font-size:12px;color:#b7c7b2}
-</style></head><body><div class="wrap"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Версия 0.12 · Столовая и строительство · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><div class="stat">🥫 Еда <b id="food">120</b></div><div class="stat">🪵 Материалы <b id="wood">160</b></div><div class="stat">⚙️ Металл <b id="metal">90</b></div><div class="stat">👥 Люди <b id="people">12</b></div><div class="stat">❤️ База <b id="hp">100</b></div></div><nav class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
+</style><style id="world13">
+#world{padding:0 8px 90px}
+#world>h2{margin:10px 5px;font-size:18px}
+#world>p{display:none}
+#world .worldmap{height:calc(100dvh - 205px);min-height:420px;max-height:820px;border-radius:10px;background:#263d2f;touch-action:none}
+#world .worldmap:before,#world .worldmap:after{display:none}
+#world .worldmap canvas{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
+#world .mapnode{min-width:0;max-width:104px;padding:4px 6px;border-radius:8px;background:#182d23d9;border:1px solid #a4b59b;font-size:10px;line-height:1.15;box-shadow:0 4px 8px #07170c9c;white-space:normal}
+#world .mapnode b{font-size:23px}
+#world .mapnode small{font-size:9px}
+#world .mapnode.active{border:2px solid #e6c66b;background:#4a4630f2}
+#world .mapnode.locked{opacity:.8}
+#world .siteinfo{margin:8px 0}
+#world .worldmap .worldhud{position:absolute;top:8px;left:8px;z-index:4;padding:7px 10px;border-radius:8px;background:#172b22d9;color:#f1e6c8;font-size:12px;pointer-events:none}
+</style></head><body><div class="wrap"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Версия 0.13 · Изометрический мир · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><div class="stat">🥫 Еда <b id="food">120</b></div><div class="stat">🪵 Материалы <b id="wood">160</b></div><div class="stat">⚙️ Металл <b id="metal">90</b></div><div class="stat">👥 Люди <b id="people">12</b></div><div class="stat">❤️ База <b id="hp">100</b></div></div><nav class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
 <h2>🌾 Земледелие · опытная версия</h2>
 <div class="info">Каждая ферма даёт 4 грядки. Посадка расходует семена, рост занимает игровые дни. Урожай собирается вручную или автоматически при назначении агронома.</div>
 <div class="agrow"><label>Культура <select id="cropSelect"></select></label><label>Агроном <select id="farmerSelect"></select></label></div>
@@ -453,5 +467,68 @@ inspectCell=function(x,y){
   if(button)button.onclick=()=>openKitchen();
  }
 };
+
+/* 0.13 isometric overworld; original site discovery and expedition mechanics preserved */
+const worldRenderBefore13=renderWorld;
+let worldPan={x:0,y:0},worldScale=1,worldPointer=null;
+function worldHash(x,y){let n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n)}
+function worldCanvasDraw(){
+ const el=document.getElementById('worldmap'),canvas=el.querySelector('canvas');if(!canvas)return;
+ const width=el.clientWidth,height=el.clientHeight,dpr=Math.min(2,window.devicePixelRatio||1);
+ if(!width||!height)return;
+ canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);
+ const c=canvas.getContext('2d');c.scale(dpr,dpr);
+ c.fillStyle='#243a2d';c.fillRect(0,0,width,height);
+ const tw=43*worldScale,th=22*worldScale,originX=width/2+worldPan.x,originY=height*.40+worldPan.y;
+ function pt(x,y){return [originX+(x-y)*tw/2,originY+(x+y)*th/2]}
+ function tile(x,y,color){let [px,py]=pt(x,y);c.fillStyle=color;c.beginPath();c.moveTo(px,py-th/2);c.lineTo(px+tw/2,py);c.lineTo(px,py+th/2);c.lineTo(px-tw/2,py);c.closePath();c.fill()}
+ for(let y=-24;y<25;y++)for(let x=-24;x<25;x++){
+  const h=worldHash(x,y),r=worldHash(x+90,y+90);
+  const road=Math.abs(x-y+3)<1.3||Math.abs(x+8)<1&&y>0&&y<14;
+  const urban=x>4&&y>-5&&y<7;
+  const farm=x< -5&&y>2&&y<12;
+  const color=road?'#817a60':urban?(h>.5?'#565f4b':'#4e5b48'):farm?'#626746':h>.72?'#36573d':h>.38?'#3c5e43':'#476a48';
+  tile(x,y,color);
+  let [px,py]=pt(x,y);
+  if(px< -30||px>width+30||py< -50||py>height+50)continue;
+  if(!road&&!urban&&h>.61&&r>.22){
+   const sz=(8+worldHash(x+12,y)*12)*worldScale;
+   c.fillStyle='#192e25';c.fillRect(px-1.5*worldScale,py-sz*.55,3*worldScale,sz*.65);
+   c.fillStyle=h>.83?'#244e35':'#1b4432';
+   c.beginPath();c.moveTo(px,py-sz*1.7);c.lineTo(px-sz*.55,py-sz*.35);c.lineTo(px+sz*.55,py-sz*.35);c.closePath();c.fill();
+  }else if(urban&&h>.43){
+   const bh=(9+worldHash(x+2,y+4)*24)*worldScale;
+   c.fillStyle='#393d36';c.fillRect(px-8*worldScale,py-bh,16*worldScale,bh);
+   c.fillStyle='#737466';c.beginPath();c.moveTo(px-8*worldScale,py-bh);c.lineTo(px,py-bh-5*worldScale);c.lineTo(px+8*worldScale,py-bh);c.lineTo(px,py-bh+4*worldScale);c.fill();
+  }
+ }
+ // Landmark nodes use the same projected plane as the terrain.
+ for(const [id,site] of Object.entries(sites)){
+  const node=el.querySelector('[data-site="'+id+'"]');if(!node)continue;
+  const x=(site.x-50)/4,y=(site.y-50)/4;
+  const [px,py]=pt(x,y);
+  node.style.left=px+'px';node.style.top=(py-18*worldScale)+'px';
+  node.style.display=(px< -65||px>width+65||py< -80||py>height+80)?'none':'';
+ }
+}
+renderWorld=function(){
+ worldRenderBefore13();
+ const map=document.getElementById('worldmap');
+ const canvas=document.createElement('canvas');canvas.setAttribute('aria-hidden','true');map.prepend(canvas);
+ const hud=document.createElement('div');hud.className='worldhud';hud.textContent='🌍 Окрестности · перемещай карту пальцем';map.append(hud);
+ Object.keys(sites).forEach((id,i)=>{const node=map.querySelectorAll('.mapnode')[i];if(node)node.dataset.site=id});
+ worldCanvasDraw();
+};
+const worldMapEl=document.getElementById('worldmap');
+worldMapEl.addEventListener('pointerdown',e=>{if(e.target.closest('.mapnode'))return;worldPointer={id:e.pointerId,x:e.clientX,y:e.clientY,panX:worldPan.x,panY:worldPan.y};worldMapEl.setPointerCapture(e.pointerId)});
+worldMapEl.addEventListener('pointermove',e=>{if(!worldPointer||e.pointerId!==worldPointer.id)return;worldPan.x=worldPointer.panX+e.clientX-worldPointer.x;worldPan.y=worldPointer.panY+e.clientY-worldPointer.y;worldCanvasDraw()});
+for(const name of ['pointerup','pointercancel'])worldMapEl.addEventListener(name,()=>{worldPointer=null});
+window.addEventListener('resize',()=>{if(activeTab==='world')worldCanvasDraw()});
+document.getElementById('goWorld').onclick=()=>{
+ const site=sites[activeSite];if(!site?.type)return;
+ document.getElementById('destination').value=site.type;openTab('exp');
+ msg('Выбрано место: '+site.name+'. Отправь экспедицию.');
+};
+
 openTab('base');changeMapMode('view');
 </script></body></html>
