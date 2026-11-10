@@ -16,6 +16,35 @@
 #objectPanel button{margin:7px 6px 0 0;padding:10px;border-radius:7px;border:1px solid #9b9b74;background:#405e49;color:white}
 #objectPanel[hidden]{display:none}
 @media(max-width:390px){.game-tabs button{font-size:10px;padding:9px 0}}
+</style><style id="compact09">
+/* Mobile-first play surface; panels are kept compact. */
+@media(max-width:820px){
+body{overflow-x:hidden}.wrap{width:100%;max-width:none}
+header{padding:7px 10px!important}header h1{font-size:17px!important;margin:0!important}header small{font-size:10px!important}
+.stats{padding:5px;gap:4px}.stat{padding:5px 7px;font-size:11px}
+.game-tabs{position:fixed!important;top:auto!important;bottom:0;left:0;right:0;padding:5px 4px max(5px,env(safe-area-inset-bottom));z-index:60;box-shadow:0 -4px 18px #08120d}
+.wrap{padding-bottom:75px}.board{height:calc(100dvh - 235px);min-height:300px;max-height:800px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.board canvas{width:100%;height:100%;object-fit:contain}
+.modebar{padding:6px 9px;font-size:12px}.modebar button{padding:7px 9px;font-size:12px}
+#objectPanel{position:fixed;bottom:67px;left:8px;right:8px;z-index:55;margin:0;max-height:45dvh;overflow:auto;box-shadow:0 0 0 100vmax #0005}
+#objectPanel button{padding:9px;font-size:13px}
+.cook,.agri,.nutrition,.expeditions,.world{padding:10px!important}
+.cook h2,.agri h2,.nutrition h2,.world h2{font-size:17px!important;margin:5px 0}
+.cook .cooknote,.agri .info{font-size:11px;line-height:1.35}
+.cook .cookrow{gap:5px;margin:5px 0}
+.cook select,.cook button{padding:7px;font-size:12px}
+.cook .cookgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+.cook .recipe{min-width:0;min-height:95px;padding:6px 3px;text-align:center;border-radius:10px;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.cook .recipe b{font-size:10px;line-height:1.15;overflow-wrap:anywhere}
+.cook .recipe small{display:none}
+.cook .recipe button{display:none}
+.cook .recipe::before{content:'🍲';display:block;font-size:24px;margin-bottom:3px}
+.cook .recipe.recipe-locked{opacity:.55;filter:grayscale(.7)}
+.cook .recipe.recipe-ready{border-color:#b6a36b;background:#3a4b31}
+#recipeDetails{position:fixed;bottom:70px;left:8px;right:8px;z-index:70;background:#273b2d;border:1px solid #c0a66d;border-radius:12px;padding:14px;box-shadow:0 0 0 100vmax #0008;max-height:65dvh;overflow:auto}
+#recipeDetails[hidden]{display:none}#recipeDetails h3{margin:0 0 8px;color:#f0d69b}
+#recipeDetails button{margin:7px 6px 0 0}
+}
 </style></head><body><div class="wrap"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Прототип 0.8 · Кулинария · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><div class="stat">🥫 Еда <b id="food">120</b></div><div class="stat">🪵 Материалы <b id="wood">160</b></div><div class="stat">⚙️ Металл <b id="metal">90</b></div><div class="stat">👥 Люди <b id="people">12</b></div><div class="stat">❤️ База <b id="hp">100</b></div></div><nav class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
 <h2>🌾 Земледелие · опытная версия</h2>
 <div class="info">Каждая ферма даёт 4 грядки. Посадка расходует семена, рост занимает игровые дни. Урожай собирается вручную или автоматически при назначении агронома.</div>
@@ -24,7 +53,7 @@
 <div class="agrow"><button id="autoFarm">Автосбор: выкл.</button><button id="waterAll">💧 Полить грядки (−3 материала)</button></div>
 <div class="info" id="agriSummary"></div><div class="plots" id="plots"></div>
 <div class="inventory" id="harvestInventory"></div>
-</section><section class="cook" id="cooking"><h2>🍲 Кухня и рецепты</h2><p class="cooknote">Ингредиенты берутся со склада урожая и экспедиций. Готовые блюда повышают запас еды. Уровень повара и оборудование ограничивают меню.</p><div class="cookrow"><label>Повар <select id="chef"></select></label><label>Оборудование <select id="kitchen"><option value="1">1 · Костёр</option><option value="2">2 · Печь (40 материалов, 15 металла)</option><option value="3">3 · Кухня (80 материалов, 40 металла)</option></select></label><button id="upgradeKitchen">Улучшить кухню</button></div><div id="cookStatus" class="cooknote"></div><div class="cookrow"><label>Показать <select id="recipeFilter"><option value="all">Все рецепты</option><option value="ready">Доступные сейчас</option><option value="locked">Закрытые</option></select></label></div><div id="recipes" class="cookgrid"></div><div class="meal" id="mealStock"></div></section><section class="world" id="world"><h2>🗺️ Окрестности убежища</h2><p>Разведывай точки интереса, отправляй людей за припасами и раскрывай историю. Выбирай место на карте.</p><div id="radioStatus" class="statuspill">📻 Связь отсутствует</div><div class="worldmap" id="worldmap"></div><div class="siteinfo" id="siteinfo"></div><div class="mapactions"><button id="goWorld">Выбрать экспедицию</button></div><div class="story" id="story"></div></section><section class="expeditions"><div class="section">Экспедиции · выжившие</div><div class="missions" id="missions"></div><div class="expform"><label>Куда отправить <select id="destination"><option value="forest">🌲 Охота в лесу · 1 день</option><option value="scout">🔭 Разведка окрестностей · 1 день</option><option value="city">🏚️ Город: поиск припасов · 2 дня</option><option value="farmstead">🚜 Заброшенная ферма · 2 дня</option><option value="clinic">🏥 Медпункт · 2 дня</option><option value="relay">📡 Радиовышка · 3 дня</option></select></label><div class="section" style="margin-top:10px">Выбери участников (1–2)</div><div class="settlers" id="settlers"></div><button id="send" class="send">Отправить экспедицию</button></div><div class="section" style="margin-top:12px">Журнал событий</div><div id="expLog" class="expLog"></div></section><div class="bottom"><button id="next">☀ Следующий день</button><button id="attack" class="danger">☣ Набег зомби</button><button id="reset">↺ Сброс</button></div><div class="message" id="message">Выбери постройку и нажми на свободную клетку.</div><div class="help">Здания внутри ограды производят ресурсы. Башни и ловушки можно размещать за её пределами. Прогресс сохраняется в браузере. Это локальный прототип, пока без сервера MMO.</div></div><script>
+</section><section class="cook" id="cooking"><h2>🍲 Кухня и рецепты</h2><p class="cooknote">Ингредиенты берутся со склада урожая и экспедиций. Готовые блюда повышают запас еды. Уровень повара и оборудование ограничивают меню.</p><div class="cookrow"><label>Повар <select id="chef"></select></label><label>Оборудование <select id="kitchen"><option value="1">1 · Костёр</option><option value="2">2 · Печь (40 материалов, 15 металла)</option><option value="3">3 · Кухня (80 материалов, 40 металла)</option></select></label><button id="upgradeKitchen">Улучшить кухню</button></div><div id="cookStatus" class="cooknote"></div><div class="cookrow"><label>Показать <select id="recipeFilter"><option value="all">Все рецепты</option><option value="ready">Доступные сейчас</option><option value="locked">Закрытые</option></select></label></div><div id="recipes" class="cookgrid"></div><div id="recipeDetails" hidden></div><div class="meal" id="mealStock"></div></section><section class="world" id="world"><h2>🗺️ Окрестности убежища</h2><p>Разведывай точки интереса, отправляй людей за припасами и раскрывай историю. Выбирай место на карте.</p><div id="radioStatus" class="statuspill">📻 Связь отсутствует</div><div class="worldmap" id="worldmap"></div><div class="siteinfo" id="siteinfo"></div><div class="mapactions"><button id="goWorld">Выбрать экспедицию</button></div><div class="story" id="story"></div></section><section class="expeditions"><div class="section">Экспедиции · выжившие</div><div class="missions" id="missions"></div><div class="expform"><label>Куда отправить <select id="destination"><option value="forest">🌲 Охота в лесу · 1 день</option><option value="scout">🔭 Разведка окрестностей · 1 день</option><option value="city">🏚️ Город: поиск припасов · 2 дня</option><option value="farmstead">🚜 Заброшенная ферма · 2 дня</option><option value="clinic">🏥 Медпункт · 2 дня</option><option value="relay">📡 Радиовышка · 3 дня</option></select></label><div class="section" style="margin-top:10px">Выбери участников (1–2)</div><div class="settlers" id="settlers"></div><button id="send" class="send">Отправить экспедицию</button></div><div class="section" style="margin-top:12px">Журнал событий</div><div id="expLog" class="expLog"></div></section><div class="bottom"><button id="next">☀ Следующий день</button><button id="attack" class="danger">☣ Набег зомби</button><button id="reset">↺ Сброс</button></div><div class="message" id="message">Выбери постройку и нажми на свободную клетку.</div><div class="help">Здания внутри ограды производят ресурсы. Башни и ловушки можно размещать за её пределами. Прогресс сохраняется в браузере. Это локальный прототип, пока без сервера MMO.</div></div><script>
 const C=document.getElementById('game'),ctx=C.getContext('2d'),W=16,H=12,S=50;const defs={tower:{name:'Башня',icon:'🎯',cost:[0,35,25]},trap:{name:'Ловушка',icon:'🪤',cost:[0,15,5]},farm:{name:'Ферма',icon:'🌱',cost:[0,30,0]},scrap:{name:'Мастерская',icon:'🔧',cost:[0,25,15]},house:{name:'Жильё',icon:'🏠',cost:[20,40,0]},wall:{name:'Баррикада',icon:'🧱',cost:[0,15,0]},remove:{name:'Убрать',icon:'✖',cost:[0,0,0]}};let selected='tower',state;const initialSettlers=()=>[{id:1,name:'Анна',role:'Фельдшер',skill:2,health:100,status:'дома'},{id:2,name:'Виктор',role:'Механик',skill:3,health:100,status:'дома'},{id:3,name:'Марина',role:'Агроном',skill:2,health:100,status:'дома'},{id:4,name:'Егор',role:'Охотник',skill:7,health:100,status:'дома'},{id:5,name:'Лена',role:'Разведчица',skill:6,health:100,status:'дома'}];const seed=()=>({day:1,food:120,wood:160,metal:90,people:5,hp:100,settlers:initialSettlers(),expeditions:[],log:[],buildings:[{x:6,y:5,t:'hq'},{x:5,y:4,t:'farm'},{x:8,y:5,t:'house'},{x:7,y:7,t:'scrap'},{x:3,y:4,t:'tower'},{x:12,y:6,t:'trap'}],zombies:[],wave:0});try{state=JSON.parse(localStorage.getItem('laststand_v08')||localStorage.getItem('laststand_v05')||localStorage.getItem('laststand_v01'))||seed()}catch{state=seed()}if(!Array.isArray(state.settlers)){state.settlers=initialSettlers();state.expeditions=[];state.log=[];state.people=state.settlers.length}state.expeditions ||= [];state.log ||= [];const inside=(x,y)=>x>=4&&x<=10&&y>=3&&y<=8;const occupied=(x,y)=>state.buildings.some(b=>b.x===x&&b.y===y);const $=id=>document.getElementById(id);const save=()=>{try{localStorage.setItem('laststand_v08',JSON.stringify(state))}catch{}};const msg=t=>$('message').textContent=t;function renderUI(){state.people=state.settlers.filter(p=>p.health>0).length;for(let k of ['food','wood','metal','people','hp'])$(k).textContent=state[k];$('day').textContent='День '+state.day;$('wave').textContent=state.wave?'Набегов: '+state.wave:'Угроза: низкая';document.querySelectorAll('.tool').forEach(el=>el.classList.toggle('active',el.dataset.t===selected))}const TW=54,TH=27,OX=400,OY=100;
 let zoom=1,panX=0,panY=0,preview=null;
 function diamond(x,y,fill,stroke){ctx.beginPath();ctx.moveTo(x,y-TH/2);ctx.lineTo(x+TW/2,y);ctx.lineTo(x,y+TH/2);ctx.lineTo(x-TW/2,y);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=.65;ctx.stroke()}}
@@ -233,5 +262,31 @@ document.getElementById('modeView').onclick=()=>changeMapMode('view');
 document.getElementById('modeBuild').onclick=()=>changeMapMode('build');
 const drawBeforeModes=draw;
 draw=function(){drawBeforeModes();ctx.fillStyle='#d7c79b';ctx.fillRect(0,601,800,39);ctx.fillStyle='#19291f';ctx.font='bold 15px system-ui';ctx.fillText(window.mapMode==='view'?'Осмотр · коснись здания для действий':'Строительство · выбери клетку для размещения',18,625)};
+
+/* Compact recipe catalogue: select a node to inspect ingredients and cook. */
+const renderCookingBeforeCompact=renderCooking;
+renderCooking=function(){
+ renderCookingBeforeCompact();
+ const nodes=[...document.querySelectorAll('#recipes .recipe')];
+ nodes.forEach((card)=>{
+  const original=card.querySelector('button');
+  if(!original)return;
+  const unlocked=original.textContent.indexOf('Закрыто')<0;
+  const ready=!original.disabled;
+  card.classList.toggle('recipe-locked',!unlocked);
+  card.classList.toggle('recipe-ready',ready);
+  card.setAttribute('role','button');card.tabIndex=0;
+  const show=()=>{
+   const details=document.getElementById('recipeDetails');details.replaceChildren();
+   const heading=document.createElement('h3');heading.textContent=card.querySelector('b')?.textContent||'Рецепт';details.append(heading);
+   card.querySelectorAll('small').forEach(el=>{const p=document.createElement('p');p.textContent=el.textContent;details.append(p)});
+   const cook=document.createElement('button');cook.textContent=original.textContent;cook.disabled=original.disabled;cook.onclick=()=>{original.click();details.hidden=true};details.append(cook);
+   const close=document.createElement('button');close.textContent='Закрыть';close.onclick=()=>details.hidden=true;details.append(close);
+   details.hidden=false;
+  };
+  card.onclick=show;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}};
+ });
+};
+renderCooking();
 openTab('base');changeMapMode('view');
 </script></body></html>
