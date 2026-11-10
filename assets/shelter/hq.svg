@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><defs>
+<linearGradient id="roof" x2=".9" y2="1"><stop stop-color="#727a6e"/><stop offset=".55" stop-color="#424b44"/><stop offset="1" stop-color="#242e2a"/></linearGradient>
+<linearGradient id="front" x2="0" y2="1"><stop stop-color="#737467"/><stop offset="1" stop-color="#353a34"/></linearGradient>
+<linearGradient id="side" x2="0" y2="1"><stop stop-color="#62675c"/><stop offset="1" stop-color="#292f2b"/></linearGradient>
+<linearGradient id="tarp" x2=".8" y2="1"><stop stop-color="#6f7351"/><stop offset="1" stop-color="#353e31"/></linearGradient>
+<pattern id="rust" width="32" height="27" patternUnits="userSpaceOnUse"><path d="M2 7l5-2m13 13 4-3m-12 9 2-2" stroke="#9b6545" stroke-width="2" opacity=".5"/><circle cx="28" cy="4" r="1.8" fill="#2d322e"/></pattern>
+<filter id="shadow"><feGaussianBlur stdDeviation="12"/></filter></defs>
+<ellipse cx="252" cy="424" rx="194" ry="43" fill="#0c120d" opacity=".45" filter="url(#shadow)"/>
+<!-- building mass, high top-down isometric -->
+<path d="M80 224L249 136 430 225 260 321Z" fill="url(#roof)" stroke="#222b27" stroke-width="7"/>
+<path d="M80 224L260 321 260 412 80 313Z" fill="url(#side)" stroke="#252b28" stroke-width="5"/>
+<path d="M260 321L430 225 430 321 260 412Z" fill="url(#front)" stroke="#222a27" stroke-width="5"/>
+<path d="M80 224L249 136 430 225 260 321Z" fill="url(#rust)" opacity=".7"/>
+<!-- roof seams -->
+<g stroke="#9a9a86" opacity=".55" stroke-width="3"><path d="M117 205l179 98M158 183l179 99M199 162l181 99M110 240l167-86M161 266l165-85M214 292l162-86"/></g>
+<!-- front wall panels -->
+<g stroke="#242d28" stroke-width="3" opacity=".8"><path d="M300 299v89M350 271v91M399 242v94M100 236v83M150 264v83M202 292v82"/></g>
+<!-- warm windows -->
+<g fill="#e6a957" stroke="#1c2521" stroke-width="7"><path d="M299 333l29-16v32l-29 17z"/><path d="M376 289l30-17v34l-30 16z"/><path d="M112 272l30 17v31l-30-17z"/><path d="M177 310l31 17v31l-31-17z"/></g>
+<g stroke="#584631" stroke-width="3"><path d="M314 326v31M390 281v32M127 280v32M192 317v33"/></g>
+<!-- entrance and stair -->
+<path d="M325 345l41-24v62l-41 24Z" fill="#151d19" stroke="#8d8066" stroke-width="5"/>
+<path d="M321 404l48-27 23 14-48 29zM320 420l50-28 23 13-50 29z" fill="#8c8470" stroke="#3b3b31" stroke-width="4"/>
+<!-- tarp canopy -->
+<path d="M273 318L332 282 400 305 344 348Z" fill="url(#tarp)" stroke="#b4a984" stroke-width="5"/>
+<g stroke="#b7a67b" stroke-width="3"><path d="M275 318l-5 82M400 305l5 75M344 348l-1 79"/></g>
+<!-- rooftop antenna -->
+<g stroke="#493b30" stroke-width="8"><path d="M159 177L169 57M169 57L195 180M153 111l32 0M159 86l23 0"/></g>
+<g stroke="#9c4438" stroke-width="5"><path d="M164 66L171 28L177 67M165 98l13 0"/></g><circle cx="171" cy="28" r="7" fill="#e94b35"/>
+<!-- satellite dish and support -->
+<path d="M261 162L270 110 290 108 286 174" fill="#333d39" stroke="#1c2926" stroke-width="6"/>
+<ellipse cx="280" cy="100" rx="63" ry="28" transform="rotate(-29 280 100)" fill="#c3c1ad" stroke="#3e4c48" stroke-width="9"/>
+<ellipse cx="280" cy="100" rx="47" ry="20" transform="rotate(-29 280 100)" fill="none" stroke="#797f73" stroke-width="3"/>
+<path d="M280 100l38-40" stroke="#2b3432" stroke-width="6"/><circle cx="280" cy="100" r="6" fill="#3e4843"/>
+<!-- banner -->
+<path d="M349 304l43-23v49l-43 24z" fill="#843d34" stroke="#c08b62" stroke-width="3"/><path d="M365 307l12-6m-6-7v26m-10-11l21 2" stroke="#ead5ac" stroke-width="3"/>
+<!-- boxes and barrels -->
+<g stroke="#302d25" stroke-width="4"><path d="M401 365l29-15 22 13-29 17z" fill="#9a8260"/><path d="M401 365v25l22 13v-23z" fill="#62523c"/><path d="M423 380l29-17v26l-29 14z" fill="#77634a"/><ellipse cx="89" cy="348" rx="13" ry="7" fill="#4c6a67"/><path d="M76 348v29q13 12 26 0v-29" fill="#344f4e"/></g>
+<path d="M89 362v14M409 376l27-14" stroke="#b8aa86" stroke-width="3"/>
+<!-- tarps on left -->
+<path d="M59 274L124 243 173 280 101 319Z" fill="url(#tarp)" stroke="#a1a080" stroke-width="4"/>
+<g stroke="#c0b391" stroke-width="3"><path d="M59 274l-7 58M101 319l-2 58"/></g>
+</svg>
