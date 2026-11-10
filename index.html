@@ -101,7 +101,23 @@ header{padding:7px 10px!important}header h1{font-size:17px!important;margin:0!im
 #world .worldlegend{position:absolute;bottom:8px;left:8px;z-index:4;background:#162b22e8;color:#e5dfc8;border-radius:8px;padding:7px;font-size:10px;pointer-events:none}
 #world .worldmap .worldhud{right:57px;left:8px;width:max-content;max-width:calc(100% - 75px)}
 #world .siteinfo{border-left:4px solid #d6b56b}
-</style></head><body><div class="wrap"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Версия 0.15.1 · Исправлена карта · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><div class="stat">🥫 Еда <b id="food">120</b></div><div class="stat">🪵 Материалы <b id="wood">160</b></div><div class="stat">⚙️ Металл <b id="metal">90</b></div><div class="stat">👥 Люди <b id="people">12</b></div><div class="stat">❤️ База <b id="hp">100</b></div></div><nav class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
+</style><style id="build16">
+#buildCatalog{display:none;position:fixed;inset:0;z-index:105;background:#15261d;color:#f2e8cd;overflow-y:auto;padding:12px 12px 90px}
+#buildCatalog.open{display:block}
+#buildCatalog .buildhead{display:flex;align-items:center;gap:12px;position:sticky;top:-12px;background:#15261d;padding:12px 0;z-index:2}
+#buildCatalog .buildhead button{padding:10px 14px;background:#344b39;color:#f4e8c9;border:1px solid #879b76;border-radius:9px}
+#buildCatalog .buildhead h2{font-size:20px;margin:0}
+#buildCatalog .buildintro{font-size:13px;color:#c9d1bb;margin:8px 0 16px}
+#buildCatalog .buildtiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#buildCatalog .buildtile{display:flex;flex-direction:column;gap:7px;min-height:155px;padding:14px 10px;background:linear-gradient(145deg,#38513d,#243a2e);color:#f5ebd4;border:1px solid #748b6e;border-radius:13px;text-align:left}
+#buildCatalog .buildtile .symbol{font-size:38px;line-height:1.2}
+#buildCatalog .buildtile strong{font-size:14px}
+#buildCatalog .buildtile small{font-size:11px;color:#cbd5bc}
+#buildCatalog .buildtile .choose{margin-top:auto;color:#efd28c;font-size:12px;font-weight:700}
+#buildCatalog .buildtile.unaffordable{opacity:.7}
+#buildCatalog .buildtile.unaffordable .choose{color:#e5ae9c}
+#modebar .modes{display:flex;gap:7px}
+</style></head><body><div class="wrap"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Версия 0.16 · Каталог строительства · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><div class="stat">🥫 Еда <b id="food">120</b></div><div class="stat">🪵 Материалы <b id="wood">160</b></div><div class="stat">⚙️ Металл <b id="metal">90</b></div><div class="stat">👥 Люди <b id="people">12</b></div><div class="stat">❤️ База <b id="hp">100</b></div></div><nav class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
 <h2>🌾 Земледелие · опытная версия</h2>
 <div class="info">Каждая ферма даёт 4 грядки. Посадка расходует семена, рост занимает игровые дни. Урожай собирается вручную или автоматически при назначении агронома.</div>
 <div class="agrow"><label>Культура <select id="cropSelect"></select></label><label>Агроном <select id="farmerSelect"></select></label></div>
@@ -109,7 +125,7 @@ header{padding:7px 10px!important}header h1{font-size:17px!important;margin:0!im
 <div class="agrow"><button id="autoFarm">Автосбор: выкл.</button><button id="waterAll">💧 Полить грядки (−3 материала)</button></div>
 <div class="info" id="agriSummary"></div><div class="plots" id="plots"></div>
 <div class="inventory" id="harvestInventory"></div>
-</section><section class="cook" id="cooking"><h2>🍲 Кухня и рецепты</h2><p class="cooknote">Ингредиенты берутся со склада урожая и экспедиций. Готовые блюда повышают запас еды. Уровень повара и оборудование ограничивают меню.</p><div class="cookrow"><label>Повар <select id="chef"></select></label><label>Оборудование <select id="kitchen"><option value="1">1 · Костёр</option><option value="2">2 · Печь (40 материалов, 15 металла)</option><option value="3">3 · Кухня (80 материалов, 40 металла)</option></select></label><button id="upgradeKitchen">Улучшить кухню</button></div><div id="cookStatus" class="cooknote"></div><div class="cookrow"><label>Показать <select id="recipeFilter"><option value="all">Все рецепты</option><option value="ready">Доступные сейчас</option><option value="locked">Закрытые</option></select></label></div><div id="recipes" class="cookgrid"></div><div id="recipeDetails" hidden></div><div class="meal" id="mealStock"></div></section><section class="world" id="world"><h2>🗺️ Окрестности убежища</h2><p>Разведывай точки интереса, отправляй людей за припасами и раскрывай историю. Выбирай место на карте.</p><div id="radioStatus" class="statuspill">📻 Связь отсутствует</div><div class="worldmap" id="worldmap"></div><div class="siteinfo" id="siteinfo"></div><div class="mapactions"><button id="goWorld">Выбрать экспедицию</button></div><div class="story" id="story"></div></section><section class="expeditions"><div class="section">Экспедиции · выжившие</div><div class="missions" id="missions"></div><div class="expform"><label>Куда отправить <select id="destination"><option value="forest">🌲 Охота в лесу · 1 день</option><option value="scout">🔭 Разведка окрестностей · 1 день</option><option value="city">🏚️ Город: поиск припасов · 2 дня</option><option value="farmstead">🚜 Заброшенная ферма · 2 дня</option><option value="clinic">🏥 Медпункт · 2 дня</option><option value="relay">📡 Радиовышка · 3 дня</option></select></label><div class="section" style="margin-top:10px">Выбери участников (1–2)</div><div class="settlers" id="settlers"></div><button id="send" class="send">Отправить экспедицию</button></div><div class="section" style="margin-top:12px">Журнал событий</div><div id="expLog" class="expLog"></div></section><div class="bottom"><button id="next">☀ Следующий день</button><button id="attack" class="danger">☣ Набег зомби</button><button id="reset">↺ Сброс</button></div><div class="message" id="message">Выбери постройку и нажми на свободную клетку.</div><div class="help">Здания внутри ограды производят ресурсы. Башни и ловушки можно размещать за её пределами. Прогресс сохраняется в браузере. Это локальный прототип, пока без сервера MMO.</div></div><div id="kitchenScreen" aria-label="Столовая">
+</section><section class="cook" id="cooking"><h2>🍲 Кухня и рецепты</h2><p class="cooknote">Ингредиенты берутся со склада урожая и экспедиций. Готовые блюда повышают запас еды. Уровень повара и оборудование ограничивают меню.</p><div class="cookrow"><label>Повар <select id="chef"></select></label><label>Оборудование <select id="kitchen"><option value="1">1 · Костёр</option><option value="2">2 · Печь (40 материалов, 15 металла)</option><option value="3">3 · Кухня (80 материалов, 40 металла)</option></select></label><button id="upgradeKitchen">Улучшить кухню</button></div><div id="cookStatus" class="cooknote"></div><div class="cookrow"><label>Показать <select id="recipeFilter"><option value="all">Все рецепты</option><option value="ready">Доступные сейчас</option><option value="locked">Закрытые</option></select></label></div><div id="recipes" class="cookgrid"></div><div id="recipeDetails" hidden></div><div class="meal" id="mealStock"></div></section><section class="world" id="world"><h2>🗺️ Окрестности убежища</h2><p>Разведывай точки интереса, отправляй людей за припасами и раскрывай историю. Выбирай место на карте.</p><div id="radioStatus" class="statuspill">📻 Связь отсутствует</div><div class="worldmap" id="worldmap"></div><div class="siteinfo" id="siteinfo"></div><div class="mapactions"><button id="goWorld">Выбрать экспедицию</button></div><div class="story" id="story"></div></section><section class="expeditions"><div class="section">Экспедиции · выжившие</div><div class="missions" id="missions"></div><div class="expform"><label>Куда отправить <select id="destination"><option value="forest">🌲 Охота в лесу · 1 день</option><option value="scout">🔭 Разведка окрестностей · 1 день</option><option value="city">🏚️ Город: поиск припасов · 2 дня</option><option value="farmstead">🚜 Заброшенная ферма · 2 дня</option><option value="clinic">🏥 Медпункт · 2 дня</option><option value="relay">📡 Радиовышка · 3 дня</option></select></label><div class="section" style="margin-top:10px">Выбери участников (1–2)</div><div class="settlers" id="settlers"></div><button id="send" class="send">Отправить экспедицию</button></div><div class="section" style="margin-top:12px">Журнал событий</div><div id="expLog" class="expLog"></div></section><div class="bottom"><button id="next">☀ Следующий день</button><button id="attack" class="danger">☣ Набег зомби</button><button id="reset">↺ Сброс</button></div><div class="message" id="message">Выбери постройку и нажми на свободную клетку.</div><div class="help">Здания внутри ограды производят ресурсы. Башни и ловушки можно размещать за её пределами. Прогресс сохраняется в браузере. Это локальный прототип, пока без сервера MMO.</div></div><div id="buildCatalog" role="dialog" aria-modal="true" aria-label="Каталог строительства"><div class="buildhead"><button id="buildCatalogBack">← Назад</button><h2>🔨 Строительство</h2></div><p class="buildintro">Выбери здание. Каталог закроется, затем коснись свободной клетки на карте убежища.</p><div class="buildtiles" id="buildTiles"></div></div><div id="kitchenScreen" aria-label="Столовая">
 <div class="khead"><button id="kBack">← Назад</button><h2>🍲 Столовая</h2></div>
 <div class="kroom"><span class="kroomtitle">Убежище «Север» · кухня и обеденный зал</span></div>
 <div class="ktabs"><button data-ktab="production" class="active">🍳 Производство</button><button data-ktab="recipes">📖 Рецепты</button><button data-ktab="settings">⚙️ Настройки</button></div>
@@ -582,6 +598,50 @@ function checkExpeditionClock(){
 }
 setInterval(checkExpeditionClock,1000);
 checkExpeditionClock();
+
+
+/* 0.16: building catalogue is separate from map inspection and placement */
+const buildCatalog=document.getElementById('buildCatalog');
+function closeBuildCatalog(){
+ buildCatalog.classList.remove('open');
+ document.body.style.overflow='';
+}
+function openBuildCatalog(){
+ openTab('base');
+ preview=null;syncPreview();
+ document.getElementById('objectPanel').hidden=true;
+ const tiles=document.getElementById('buildTiles');tiles.replaceChildren();
+ for(const [type,def] of Object.entries(defs)){
+  const affordable=state.food>=def.cost[0]&&state.wood>=def.cost[1]&&state.metal>=def.cost[2];
+  const button=document.createElement('button');button.className='buildtile'+(affordable?'':' unaffordable');
+  const icon=document.createElement('span');icon.className='symbol';icon.textContent=def.icon;
+  const title=document.createElement('strong');title.textContent=def.name;
+  const cost=document.createElement('small');cost.textContent=type==='remove'?'Убрать существующий объект':'Стоимость: 🥫 '+def.cost[0]+' · 🪵 '+def.cost[1]+' · ⚙️ '+def.cost[2];
+  const action=document.createElement('span');action.className='choose';action.textContent=affordable?'Выбрать →':'Не хватает ресурсов · выбрать →';
+  button.append(icon,title,cost,action);
+  button.onclick=()=>{
+   selected=type;
+   closeBuildCatalog();
+   changeMapMode('build');
+   preview=null;syncPreview();renderUI();
+   msg(type==='remove'?'Коснись объекта, который нужно разобрать.':'Выбрано: '+def.name+'. Коснись свободной клетки, затем нажми «Построить».');
+  };
+  tiles.append(button);
+ }
+ buildCatalog.classList.add('open');document.body.style.overflow='hidden';
+}
+document.getElementById('buildCatalogBack').onclick=()=>{
+ closeBuildCatalog();
+ changeMapMode('view');
+};
+document.getElementById('modeBuild').onclick=openBuildCatalog;
+const originalChangeMapMode16=changeMapMode;
+changeMapMode=function(mode){
+ originalChangeMapMode16(mode);
+ document.querySelector('.toolbar').classList.add('game-tab-hidden');
+ if(mode==='view')closeBuildCatalog();
+};
+document.querySelector('.toolbar').classList.add('game-tab-hidden');
 
 openTab('base');changeMapMode('view');
 </script></body></html>
