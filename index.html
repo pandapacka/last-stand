@@ -71,8 +71,17 @@ header{padding:7px 10px!important}header h1{font-size:17px!important;margin:0!im
 #kitchenScreen .ksection label{display:block;margin:9px 0}
 #kitchenScreen .ksection select{width:100%;padding:10px;border-radius:7px;background:#364d3d;color:white;border:1px solid #76856c}
 #kitchenScreen #recipeDetails{z-index:100}
+#kitchenScreen .cook .recipe{display:flex;flex-direction:column;align-items:stretch;gap:5px;min-height:145px;border:1px solid #6c7d66;border-radius:12px;background:#34493a;text-align:center}
+#kitchenScreen .cook .recipe b{font-size:12px;line-height:1.25;min-height:30px}
+#kitchenScreen .cook .recipe small{font-size:10px;line-height:1.25}
+#kitchenScreen .cook .recipe button{font-size:11px;padding:8px 2px;margin-top:auto;background:#b99b5b;color:#17261c;border:0;border-radius:8px;font-weight:700;min-height:38px}
+#kitchenScreen .cook .recipe button:disabled{background:#536153;color:#c7d0c5}
+#kitchenScreen .cook .recipe.kready{border-color:#d0b779}
+#kitchenScreen .cook .recipe.klocked{opacity:.72}
+#kitchenScreen .kupgradebutton{display:block;width:100%;padding:14px;border:0;border-radius:10px;background:#b99b5b;color:#17261c;font-weight:700}
+#kitchenScreen .kupgradebutton:disabled{background:#526252;color:#b7c0b2}
 #kitchenScreen .kqueueitem{margin:9px 0;padding:9px;background:#344b3b;border-radius:8px}#kitchenScreen .kqueueitem progress{display:block;width:100%;height:12px;margin-top:6px;accent-color:#d2ac66}#kitchenScreen .kfoot{font-size:12px;color:#b7c7b2}
-</style></head><body><div class="wrap"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Версия 0.11.1 · Исправлена кухня · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><div class="stat">🥫 Еда <b id="food">120</b></div><div class="stat">🪵 Материалы <b id="wood">160</b></div><div class="stat">⚙️ Металл <b id="metal">90</b></div><div class="stat">👥 Люди <b id="people">12</b></div><div class="stat">❤️ База <b id="hp">100</b></div></div><nav class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
+</style></head><body><div class="wrap"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Версия 0.12 · Столовая и строительство · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><div class="stat">🥫 Еда <b id="food">120</b></div><div class="stat">🪵 Материалы <b id="wood">160</b></div><div class="stat">⚙️ Металл <b id="metal">90</b></div><div class="stat">👥 Люди <b id="people">12</b></div><div class="stat">❤️ База <b id="hp">100</b></div></div><nav class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
 <h2>🌾 Земледелие · опытная версия</h2>
 <div class="info">Каждая ферма даёт 4 грядки. Посадка расходует семена, рост занимает игровые дни. Урожай собирается вручную или автоматически при назначении агронома.</div>
 <div class="agrow"><label>Культура <select id="cropSelect"></select></label><label>Агроном <select id="farmerSelect"></select></label></div>
@@ -325,6 +334,39 @@ renderCooking=function(){
 renderCooking();
 
 
+
+/* 0.12: readable recipe actions and functional equipment upgrade */
+function renderKitchenUpgrade(){
+ const root=document.getElementById('kUpgradePanel');if(!root)return;
+ root.replaceChildren();
+ const level=ck.kitchen;
+ const title=document.createElement('h3');title.textContent='🔧 Оборудование · уровень '+level+'/3';root.append(title);
+ const desc=document.createElement('p');desc.textContent=level===1?'Сейчас: костёр. Следующее улучшение: печь, открывает блюда второго уровня.':level===2?'Сейчас: печь. Следующее улучшение: полноценная кухня, открывает сложные блюда.':'Полноценная кухня построена. Все уровни оборудования открыты.';root.append(desc);
+ if(level>=3)return;
+ const wood=level===1?40:80,metal=level===1?15:40;
+ const cost=document.createElement('p');cost.textContent='Нужно: 🪵 '+wood+' (есть '+state.wood+') · ⚙️ '+metal+' (есть '+state.metal+')';root.append(cost);
+ const btn=document.createElement('button');btn.className='kupgradebutton';btn.textContent='⬆ Улучшить до уровня '+(level+1);btn.disabled=state.wood<wood||state.metal<metal;
+ btn.onclick=()=>{document.getElementById('upgradeKitchen').click();renderKitchenUpgrade();renderCooking()};
+ root.append(btn);
+ if(btn.disabled){const note=document.createElement('p');note.textContent='Не хватает ресурсов для улучшения.';root.append(note)}
+}
+const originalRenderCooking012=renderCooking;
+renderCooking=function(){
+ originalRenderCooking012();
+ document.querySelectorAll('#recipes .recipe').forEach((card,i)=>{
+  const btn=card.querySelector('button');if(!btn)return;
+  const name=card.querySelector('b')?.textContent||'Блюдо';
+  const r=RECIPES.find(x=>x.name===name);
+  const ready=r&&canCook(r);
+  const unlocked=r&&ck.kitchen>=r.kitchen;
+  card.classList.toggle('kready',!!ready);
+  card.classList.toggle('klocked',!unlocked);
+  btn.textContent=ready?'＋ В очередь':!unlocked?'🔒 Кухня '+r.kitchen:'Недостаточно продуктов';
+  btn.disabled=!ready;
+  btn.onclick=e=>{e.stopPropagation();if(r) cookRecipe(RECIPES.indexOf(r));};
+ });
+ renderKitchenUpgrade();
+};
 /* 0.11 persistent real-time cooking queue */
 if(!Array.isArray(ck.queue))ck.queue=[];
 function settleKitchenQueue(){
@@ -384,6 +426,7 @@ function closeKitchen(){
 document.getElementById('kBack').onclick=closeKitchen;
 document.querySelectorAll('[data-ktab]').forEach(b=>b.onclick=()=>kitchenTab(b.dataset.ktab));
 const kitchenSettings=document.getElementById('kSettingsInfo');
+const kitchenUpgradePanel=document.createElement('div');kitchenUpgradePanel.id='kUpgradePanel';kitchenSettings.prepend(kitchenUpgradePanel);
 for(const id of ['dietMode','autoCook','mealTarget']){
  const select=document.getElementById(id),label=select.closest('label');
  if(label)kitchenSettings.append(label.cloneNode(false));
