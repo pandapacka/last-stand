@@ -110,3 +110,5 @@ for i in range(120):
 out=Path('assets/shelter/hq.png');out.parent.mkdir(parents=True,exist_ok=True)
 im.save(out,optimize=True)
 print(out,im.size)
+
+# Render revision 0.18
