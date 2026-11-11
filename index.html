@@ -151,6 +151,13 @@ let zoom=1,panX=0,panY=0,preview=null;
 function diamond(x,y,fill,stroke){ctx.beginPath();ctx.moveTo(x,y-TH/2);ctx.lineTo(x+TW/2,y);ctx.lineTo(x,y+TH/2);ctx.lineTo(x-TW/2,y);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=.65;ctx.stroke()}}
 function poly(pts,color,stroke){ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle=color;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.3;ctx.stroke()}}
 function cube(x,y,w,h,z,top,side,front){let a=[x-w/2,y],b=[x,y-h/2],c=[x+w/2,y],d=[x,y+h/2];poly([a,b,[b[0],b[1]-z],[a[0],a[1]-z]],side);poly([c,d,[d[0],d[1]-z],[c[0],c[1]-z]],front);poly([[a[0],a[1]-z],[b[0],b[1]-z],[c[0],c[1]-z],[d[0],d[1]-z]],top,'#1b2622')}
+defs.canteen={name:'Столовая',icon:'🍲',cost:[0,45,15]};
+if (!state.canteenPlaced) {
+  let tile;
+  for(let y=8;y>=3&&!tile;y--)for(let x=10;x>=4;x--)if(!occupied(x,y)){tile={x,y,t:'canteen'};break}
+  if(tile)state.buildings.push(tile);
+  state.canteenPlaced=true;
+}
 const sprites={};
 const art = {
   canteen:'base/canteen', hq:'base/hq', tower:'base/watchtower', trap:'base/barricade',
@@ -204,6 +211,10 @@ if (groundPattern) {
   corners.forEach(([x,y],i)=>{const p=pt(x,y);if(i)ctx.lineTo(...p);else ctx.moveTo(...p)});
   ctx.closePath();ctx.fillStyle=groundPattern;ctx.globalAlpha=.78;ctx.fill();ctx.restore();
 }
+ctx.beginPath();
+for(let x=0;x<=W;x++){ctx.moveTo(...pt(x-.5,-.5));ctx.lineTo(...pt(x-.5,H-.5))}
+for(let y=0;y<=H;y++){ctx.moveTo(...pt(-.5,y-.5));ctx.lineTo(...pt(W-.5,y-.5))}
+ctx.strokeStyle='rgba(223,232,190,.52)';ctx.lineWidth=.85/zoom;ctx.stroke();
 let fence=[[3.5,2.5],[10.5,2.5],[10.5,8.5],[3.5,8.5]];ctx.strokeStyle='#c4b083';ctx.lineWidth=5;ctx.setLineDash([10,4]);ctx.beginPath();fence.forEach(([x,y],i)=>{let [px,py]=pt(x,y);i?ctx.lineTo(px,py):ctx.moveTo(px,py)});ctx.closePath();ctx.stroke();ctx.setLineDash([]);
 let objects=state.buildings.map(b=>({...b,p:pt(b.x,b.y)})).sort((a,b)=>(a.x+a.y)-(b.x+b.y));objects.forEach(b=>building(b,b.p[0],b.p[1]));
 for(let z of state.zombies){let [px,py]=pt(z.x,z.y);ctx.fillStyle='#94aa80';ctx.beginPath();ctx.arc(px,py-12,5,0,7);ctx.fill();ctx.strokeStyle='#75866b';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(px,py-6);ctx.lineTo(px,py+4);ctx.moveTo(px,py-2);ctx.lineTo(px+9,py+2);ctx.stroke()}
@@ -382,6 +393,7 @@ function changeMapMode(mode){
 }
 function inspectCell(x,y){
  const b=state.buildings.find(b=>b.x===x&&b.y===y);
+ if(b?.t==='canteen'){openKitchen();return}
  const panel=document.getElementById('objectPanel');
  panel.hidden=false;
  panel.replaceChildren();
@@ -694,20 +706,6 @@ changeMapMode=function(mode){
 };
 document.querySelector('.toolbar').classList.add('game-tab-hidden');
 
-openTab('base');changeMapMode('view');
-</script></body></html>
-defs.canteen={name:'Столовая',icon:'🍲',cost:[0,45,15]};
-if (!state.canteenPlaced) {
-  let tile;
-  for(let y=8;y>=3&&!tile;y--)for(let x=10;x>=4;x--)if(!occupied(x,y)){tile={x,y,t:'canteen'};break}
-  if(tile)state.buildings.push(tile);
-  state.canteenPlaced=true;
-}
-ctx.beginPath();
-for(let x=0;x<=W;x++){ctx.moveTo(...pt(x-.5,-.5));ctx.lineTo(...pt(x-.5,H-.5))}
-for(let y=0;y<=H;y++){ctx.moveTo(...pt(-.5,y-.5));ctx.lineTo(...pt(W-.5,y-.5))}
-ctx.strokeStyle='rgba(223,232,190,.52)';ctx.lineWidth=.85/zoom;ctx.stroke();
- if(b?.t==='canteen'){openKitchen();return}
 // Production and food consumption advance independently of the former day button.
 setInterval(()=>{
   agriDay();autoCookDay();nutritionDay();progressInfection();
@@ -716,3 +714,5 @@ setInterval(()=>{
 },600000);
 for(const trip of state.expeditions)if(!trip.arriveAt)trip.arriveAt=Date.now()+Math.max(0,(trip.returnDay-state.day)||0)*600000;
 settleKitchenQueue();
+openTab('base');changeMapMode('view');
+</script></body></html>
