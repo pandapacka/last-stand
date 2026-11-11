@@ -152,7 +152,7 @@ header{padding:7px 10px!important}header h1{font-size:17px!important;margin:0!im
 #kitchenScreen .cook .recipe b{font-size:16px}#kitchenScreen .cook .recipe small{display:block;font-size:13px}
 .cook .recipe button,#kitchenScreen .cook .recipe button{display:block;min-height:44px}
 #kRecipeHolder .cookrow:first-of-type,#kRecipeHolder #mealStock{display:none}
-</style></head><body><div class="wrap" data-screen="base"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Детализация убежища · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><span hidden id="food"></span><div class="stat">🍲 Блюда <b id="mealCount">0</b></div><details id="supplies"><summary class="stat">🧺 Припасы <b id="supplyCount">0</b> ▾</summary><div id="supplyList"></div></details><div class="stat" aria-label="🪵 Материалы" title="🪵 Материалы">🪵 <b id="wood">160</b></div><div class="stat" aria-label="⚙️ Металл" title="⚙️ Металл">⚙️ <b id="metal">90</b></div><div class="stat" aria-label="👥 Люди" title="👥 Люди">👥 <b id="people">12</b></div><div class="stat" aria-label="❤️ База" title="❤️ База">❤️ <b id="hp">100</b></div><small class="game-version" aria-label="Версия игры 0.23">v0.23</small></div><button id="returnBase" type="button" hidden>← В убежище</button><nav hidden class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><nav class="mapdock" aria-label="Действия на карте"><button id="selectMap" title="Выбор" aria-label="Выбор">☝</button><button id="buildMap" title="Строительство" aria-label="Строительство">⚒</button><button id="worldMap" title="Карта мира" aria-label="Карта мира">🌍</button></nav><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
+</style></head><body><div class="wrap" data-screen="base"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Детализация убежища · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><span hidden id="food"></span><div class="stat">🍲 Блюда <b id="mealCount">0</b></div><details id="supplies"><summary class="stat">🧺 Припасы <b id="supplyCount">0</b> ▾</summary><div id="supplyList"></div></details><div class="stat" aria-label="🪵 Материалы" title="🪵 Материалы">🪵 <b id="wood">160</b></div><div class="stat" aria-label="⚙️ Металл" title="⚙️ Металл">⚙️ <b id="metal">90</b></div><div class="stat" aria-label="👥 Люди" title="👥 Люди">👥 <b id="people">12</b></div><div class="stat" aria-label="❤️ База" title="❤️ База">❤️ <b id="hp">100</b></div><small class="game-version" aria-label="Версия игры 0.24">v0.24</small></div><button id="returnBase" type="button" hidden>← В убежище</button><nav hidden class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><nav class="mapdock" aria-label="Действия на карте"><button id="selectMap" title="Выбор" aria-label="Выбор">☝</button><button id="buildMap" title="Строительство" aria-label="Строительство">⚒</button><button id="worldMap" title="Карта мира" aria-label="Карта мира">🌍</button></nav><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
 <h2>🌾 Земледелие · опытная версия</h2>
 <div class="info">Каждая ферма даёт 4 грядки. Посадка расходует семена, рост занимает игровые дни. Урожай собирается вручную или автоматически при назначении агронома.</div>
 <div class="agrow"><label>Культура <select id="cropSelect"></select></label><label>Агроном <select id="farmerSelect"></select></label></div>
@@ -190,7 +190,7 @@ function cropEnd(plot,crop){
 }
 const sprites={};
 const art = {
-  siteStock:'base/supplies', canteen:'base/canteen', hq:'base/hq', tower:'base/watchtower', trap:'base/barricade',
+  site:'construction/site', hammer:'construction/hammer', saw:'construction/saw', clock:'construction/clock', canteen:'base/canteen', hq:'base/hq', tower:'base/watchtower', trap:'base/barricade',
   farm:'base/garden', scrap:'base/workshop', house:'base/barracks', wall:'base/fence',
   spruce:'nature/spruce', pine:'nature/pine', warehouse:'base/warehouse', grass:'nature/grass'
 };
@@ -241,29 +241,14 @@ function constructionSite(b,x,y,now){
   const phase=now/1000+b.x*.37+b.y*.61;
   ctx.save();
   ctx.translate(x,y);
-  diamond(0,0,'#66523a','#a78b61');
-  function beam(x1,y1,x2,y2,width,color){
-    ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);
-    ctx.strokeStyle=color;ctx.lineWidth=width;ctx.stroke();
-  }
-  for(const [px,py] of [[-20,-1],[0,-11],[19,-1]]){
-    beam(px,py,px,py-19,3,'#ab8150');
-    beam(px-1,py,px-1,py-19,1,'#ddae73');
-  }
-  beam(-20,-19,0,-29,3,'#c39863');beam(0,-29,19,-19,3,'#a07850');
-  beam(-20,-2,0,-27,2,'#b08759');beam(0,-11,19,-18,2,'#bc9869');
-  paintSprite(ctx,'siteStock',-6,7,27);
-  beam(3,5,21,-4,4,'#bf965c');
+  paintSprite(ctx,'site',0,10,60);
   for(const offset of [0,1]){
-    ctx.save();ctx.translate(-15+offset*16,-14-offset*4);
-    ctx.rotate(-.6+.78*Math.cos(phase*7+offset*2));
-    ctx.fillStyle='#d29a59';ctx.fillRect(-1,-10,2,11);
-    ctx.fillStyle='#bdc6bd';ctx.fillRect(-4,-12,9,4);ctx.restore();
+    ctx.save();ctx.translate(-13+offset*23,-9-offset*11);
+    ctx.rotate(-.75+.72*Math.cos(phase*7+offset*2));
+    paintSprite(ctx,'hammer',0,1,8);ctx.restore();
   }
-  ctx.save();ctx.translate(10+Math.sin(phase*8)*3,-3);ctx.rotate(-.36);
-  const blade=[[0,-2],[13,-2],[13,1]];
-  for(let i=12;i>=0;i-=2)blade.push([i,2],[i-1,0]);
-  poly(blade,'#cad2c9');ctx.fillStyle='#a86737';ctx.fillRect(-4,-3,5,5);ctx.restore();
+  ctx.save();ctx.translate(12+Math.sin(phase*8)*2.6,-3);ctx.rotate(-.34);
+  paintSprite(ctx,'saw',0,0,19);ctx.restore();
   for(let i=0;i<9;i++){
     const age=(phase*.9+i/9)%1;
     ctx.globalAlpha=(1-age)*.65;ctx.fillStyle='#e3c69a';
@@ -275,9 +260,10 @@ function constructionBadge(b,x,y,now,viewWidth){
   const scale=Math.max(.8,800/(zoom*viewWidth));
   ctx.save();ctx.translate(x,y+6);ctx.scale(scale,scale);
   ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
-  const label='⌛ '+kitchenClock(b.buildEnd-now),w=ctx.measureText(label).width+8;
+  const label=kitchenClock(b.buildEnd-now),w=ctx.measureText(label).width+20;
   ctx.fillStyle='#231e17';ctx.fillRect(-w/2,-8,w,16);
-  ctx.fillStyle='#ffe0a1';ctx.fillText(label,0,0);ctx.restore();
+  paintSprite(ctx,'clock',-w/2+7,7,7);
+  ctx.fillStyle='#ffe0a1';ctx.fillText(label,6,0);ctx.restore();
 }
 function draw(){
   const width=C.getBoundingClientRect().width;
@@ -334,7 +320,7 @@ function inspectTap(e,cell){
   for(const b of ordered){
     if(!completed(b)){
       const [cx,cy]=pt(b.x,b.y);
-      if(Math.abs(x-cx)<=24 && y>=cy-32 && y<=cy+13)return inspectCell(b.x,b.y);
+      if(Math.abs(x-cx)<=30 && y>=cy-42 && y<=cy+13)return inspectCell(b.x,b.y);
       continue;
     }
     const img=sprites[b.t];if(!img?.naturalWidth)continue;
