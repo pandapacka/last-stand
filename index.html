@@ -146,7 +146,13 @@ header{padding:7px 10px!important}header h1{font-size:17px!important;margin:0!im
 .wrap>.message{pointer-events:none}.wrap[data-screen=base]>.message{position:absolute;bottom:68px;left:10px;max-width:65%;font-size:12px;text-shadow:0 1px 4px black}.wrap[data-screen=base]:has(#placement:not([hidden]))>.message{display:none}
 .stats{flex-wrap:wrap}.game-version{align-self:center;color:#d2dccf;font:600 12px/1.2 system-ui;white-space:nowrap}
 .stats{overflow:visible}#supplies summary{cursor:pointer;list-style:none}#supplyList{position:absolute;top:100%;left:50%;transform:translateX(-50%);width:min(270px,90vw);max-height:45vh;overflow:auto;background:#203329;border:1px solid #65775e;border-radius:8px;padding:10px;box-shadow:0 5px 16px #10181199}#supplyList div{display:flex;justify-content:space-between;padding:3px 6px;font-size:14px}#returnBase{position:static;margin:8px;width:auto;height:auto;padding:8px 14px;font-size:14px}
-</style></head><body><div class="wrap" data-screen="base"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Детализация убежища · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><span hidden id="food"></span><div class="stat">🍲 Блюда <b id="mealCount">0</b></div><details id="supplies"><summary class="stat">🧺 Припасы <b id="supplyCount">0</b> ▾</summary><div id="supplyList"></div></details><div class="stat" aria-label="🪵 Материалы" title="🪵 Материалы">🪵 <b id="wood">160</b></div><div class="stat" aria-label="⚙️ Металл" title="⚙️ Металл">⚙️ <b id="metal">90</b></div><div class="stat" aria-label="👥 Люди" title="👥 Люди">👥 <b id="people">12</b></div><div class="stat" aria-label="❤️ База" title="❤️ База">❤️ <b id="hp">100</b></div><small class="game-version" aria-label="Версия игры 0.21">v0.21</small></div><button id="returnBase" type="button" hidden>← В убежище</button><nav hidden class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><nav class="mapdock" aria-label="Действия на карте"><button id="selectMap" title="Выбор" aria-label="Выбор">☝</button><button id="buildMap" title="Строительство" aria-label="Строительство">⚒</button><button id="worldMap" title="Карта мира" aria-label="Карта мира">🌍</button></nav><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
+#chooseRecipe{min-height:44px;background:#c4a366;color:#19241b;border-radius:8px;padding:8px 18px;font-weight:700}#finishedMeals{margin:12px 0}
+#kitchenScreen .cook .cookgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:8px}
+#kitchenScreen .cook .recipe{min-height:0;cursor:auto;text-align:left;padding:12px;gap:6px}
+#kitchenScreen .cook .recipe b{font-size:16px}#kitchenScreen .cook .recipe small{display:block;font-size:13px}
+.cook .recipe button,#kitchenScreen .cook .recipe button{display:block;min-height:44px}
+#kRecipeHolder .cookrow:first-of-type,#kRecipeHolder #mealStock{display:none}
+</style></head><body><div class="wrap" data-screen="base"><header><div><h1>☣ ПОСЛЕДНИЙ РУБЕЖ</h1><small>Детализация убежища · Убежище «Север»</small></div><div style="text-align:right"><small id="day">День 1</small><br><small id="wave">Угроза: низкая</small></div></header><div class="stats"><span hidden id="food"></span><div class="stat">🍲 Блюда <b id="mealCount">0</b></div><details id="supplies"><summary class="stat">🧺 Припасы <b id="supplyCount">0</b> ▾</summary><div id="supplyList"></div></details><div class="stat" aria-label="🪵 Материалы" title="🪵 Материалы">🪵 <b id="wood">160</b></div><div class="stat" aria-label="⚙️ Металл" title="⚙️ Металл">⚙️ <b id="metal">90</b></div><div class="stat" aria-label="👥 Люди" title="👥 Люди">👥 <b id="people">12</b></div><div class="stat" aria-label="❤️ База" title="❤️ База">❤️ <b id="hp">100</b></div><small class="game-version" aria-label="Версия игры 0.22">v0.22</small></div><button id="returnBase" type="button" hidden>← В убежище</button><nav hidden class="game-tabs" aria-label="Разделы игры"><button data-tab="base" class="active">🏕️<br>База</button><button data-tab="people">👥<br>Люди</button><button data-tab="farm">🌾<br>Хозяйство</button><button data-tab="exp">🎒<br>Походы</button><button data-tab="world">🗺️<br>Мир</button></nav><div id="modebar" class="modebar"><strong>Режим карты</strong><div class="modes"><button id="modeView" class="active">👆 Осмотр</button><button id="modeBuild">🔨 Строительство</button></div></div><div class="board"><nav class="mapdock" aria-label="Действия на карте"><button id="selectMap" title="Выбор" aria-label="Выбор">☝</button><button id="buildMap" title="Строительство" aria-label="Строительство">⚒</button><button id="worldMap" title="Карта мира" aria-label="Карта мира">🌍</button></nav><div id="placement" class="placement" hidden><span id="placementlabel">Размещение</span><button id="rotate">↻ Повернуть</button><button id="confirm">✓ Построить</button><button id="cancel">✕</button></div><div class="zoom"><button id="zin">＋</button><button id="zout">－</button></div><canvas id="game" width="800" height="640"></canvas></div><div id="objectPanel" hidden></div><div class="toolbar"><div class="section">Строительство · выбери объект и клетку</div><div class="tools" id="tools"></div></div><section class="nutrition" id="nutrition"><h2>🍲 Питание и состояние поселенцев</h2><div class="note">Каждый день выжившие съедают готовые блюда. Если еды не хватает, используют аварийные пайки (старый запас 🥫). Разнообразие повышает мораль, голод ухудшает здоровье. В экспедиции люди расходуют пайки.</div><div class="controls"><label>План питания <select id="dietMode"><option value="variety">Разнообразное</option><option value="save">Экономное</option><option value="best">Лучшие блюда</option></select></label><label>Автоготовка <select id="autoCook"><option value="off">Выключена</option><option value="on">Включена</option></select></label><label>Целевой запас блюд <select id="mealTarget"><option value="5">5</option><option value="10">10</option><option value="20">20</option></select></label></div><div class="note" id="dietSummary"></div><div class="peoplegrid" id="dietPeople"></div><div class="store" id="dietStore"></div></section><section class="agri" id="agriculture">
 <h2>🌾 Земледелие · опытная версия</h2>
 <div class="info">Каждая ферма даёт 4 грядки. Посадка расходует семена, рост занимает игровые дни. Урожай собирается вручную или автоматически при назначении агронома.</div>
 <div class="agrow"><label>Культура <select id="cropSelect"></select></label><label>Агроном <select id="farmerSelect"></select></label></div>
@@ -154,16 +160,16 @@ header{padding:7px 10px!important}header h1{font-size:17px!important;margin:0!im
 <div class="agrow"><button id="autoFarm">Автосбор: выкл.</button><button id="waterAll">💧 Полить грядки (−3 материала)</button></div>
 <div class="info" id="agriSummary"></div><div class="plots" id="plots"></div>
 <div class="inventory" id="harvestInventory"></div>
-</section><section class="cook" id="cooking"><h2>🍲 Кухня и рецепты</h2><p class="cooknote">Ингредиенты берутся со склада урожая и экспедиций. Готовые блюда повышают запас еды. Уровень повара и оборудование ограничивают меню.</p><div class="cookrow"><label>Повар <select id="chef"></select></label><label>Оборудование <select id="kitchen"><option value="1">1 · Костёр</option><option value="2">2 · Печь (40 материалов, 15 металла)</option><option value="3">3 · Кухня (80 материалов, 40 металла)</option></select></label><button id="upgradeKitchen">Улучшить кухню</button></div><div id="cookStatus" class="cooknote"></div><div class="cookrow"><label>Показать <select id="recipeFilter"><option value="all">Все рецепты</option><option value="ready">Доступные сейчас</option><option value="locked">Закрытые</option></select></label></div><div id="recipes" class="cookgrid"></div><div id="recipeDetails" hidden></div><div class="meal" id="mealStock"></div></section><section class="world" id="world"><h2>🗺️ Окрестности убежища</h2><p>Разведывай точки интереса, отправляй людей за припасами и раскрывай историю. Выбирай место на карте.</p><div id="radioStatus" class="statuspill">📻 Связь отсутствует</div><div class="worldmap" id="worldmap"></div><div class="siteinfo" id="siteinfo"></div><div class="mapactions"><button id="goWorld">Выбрать экспедицию</button></div><div class="story" id="story"></div></section><section class="expeditions"><div class="section">Экспедиции · выжившие</div><div class="missions" id="missions"></div><div class="expform"><label>Куда отправить <select id="destination"><option value="forest">🌲 Охота в лесу · 8 мин</option><option value="scout">🔭 Разведка окрестностей · 6 мин</option><option value="city">🏚️ Город: поиск припасов · 25 мин</option><option value="farmstead">🚜 Заброшенная ферма · 15 мин</option><option value="clinic">🏥 Медпункт · 30 мин</option><option value="relay">📡 Радиовышка · 35 мин</option></select></label><div class="section" style="margin-top:10px">Выбери участников (1–2)</div><div class="settlers" id="settlers"></div><button id="send" class="send">Отправить экспедицию</button></div><div class="section" style="margin-top:12px">Журнал событий</div><div id="expLog" class="expLog"></div></section><div class="bottom"><button id="attack" class="danger">☣ Набег зомби</button><button id="reset">↺ Сброс</button></div><div class="message" id="message">Выбери постройку и нажми на свободную клетку.</div><div class="help">Здания внутри ограды производят ресурсы. Башни и ловушки можно размещать за её пределами. Прогресс сохраняется в браузере. Это локальный прототип, пока без сервера MMO.</div></div><div id="buildCatalog" role="dialog" aria-modal="true" aria-label="Каталог строительства"><div class="buildhead"><button id="buildCatalogBack">← Назад</button><h2>🔨 Строительство</h2></div><p class="buildintro">Выбери здание. Каталог закроется, затем коснись свободной клетки на карте убежища.</p><div class="buildtiles" id="buildTiles"></div></div><div id="kitchenScreen" aria-label="Столовая">
+</section><section class="cook" id="cooking"><h2>🍲 Кухня и рецепты</h2><p class="cooknote">Ингредиенты берутся со склада урожая и экспедиций. Готовые блюда повышают запас еды. Уровень повара и оборудование ограничивают меню.</p><div class="cookrow"><label>Повар <select id="chef"></select></label><label>Оборудование <select id="kitchen"><option value="1">1 · Костёр</option><option value="2">2 · Печь (40 материалов, 15 металла)</option><option value="3">3 · Кухня (80 материалов, 40 металла)</option></select></label><button id="upgradeKitchen">Улучшить кухню</button></div><div id="cookStatus" class="cooknote"></div><div class="cookrow"><label>Показать <select id="recipeFilter"><option value="all">Все рецепты</option><option value="ready" selected>Можно приготовить</option><option value="locked">Закрытые</option></select></label></div><div id="recipes" class="cookgrid"></div><div id="recipeDetails" hidden></div><div class="meal" id="mealStock"></div></section><section class="world" id="world"><h2>🗺️ Окрестности убежища</h2><p>Разведывай точки интереса, отправляй людей за припасами и раскрывай историю. Выбирай место на карте.</p><div id="radioStatus" class="statuspill">📻 Связь отсутствует</div><div class="worldmap" id="worldmap"></div><div class="siteinfo" id="siteinfo"></div><div class="mapactions"><button id="goWorld">Выбрать экспедицию</button></div><div class="story" id="story"></div></section><section class="expeditions"><div class="section">Экспедиции · выжившие</div><div class="missions" id="missions"></div><div class="expform"><label>Куда отправить <select id="destination"><option value="forest">🌲 Охота в лесу · 8 мин</option><option value="scout">🔭 Разведка окрестностей · 6 мин</option><option value="city">🏚️ Город: поиск припасов · 25 мин</option><option value="farmstead">🚜 Заброшенная ферма · 15 мин</option><option value="clinic">🏥 Медпункт · 30 мин</option><option value="relay">📡 Радиовышка · 35 мин</option></select></label><div class="section" style="margin-top:10px">Выбери участников (1–2)</div><div class="settlers" id="settlers"></div><button id="send" class="send">Отправить экспедицию</button></div><div class="section" style="margin-top:12px">Журнал событий</div><div id="expLog" class="expLog"></div></section><div class="bottom"><button id="attack" class="danger">☣ Набег зомби</button><button id="reset">↺ Сброс</button></div><div class="message" id="message">Выбери постройку и нажми на свободную клетку.</div><div class="help">Здания внутри ограды производят ресурсы. Башни и ловушки можно размещать за её пределами. Прогресс сохраняется в браузере. Это локальный прототип, пока без сервера MMO.</div></div><div id="buildCatalog" role="dialog" aria-modal="true" aria-label="Каталог строительства"><div class="buildhead"><button id="buildCatalogBack">← Назад</button><h2>🔨 Строительство</h2></div><p class="buildintro">Выбери здание. Каталог закроется, затем коснись свободной клетки на карте убежища.</p><div class="buildtiles" id="buildTiles"></div></div><div id="kitchenScreen" aria-label="Столовая">
 <div class="khead"><button id="kBack">← Назад</button><h2>🍲 Столовая</h2></div>
 <div class="kroom"><span class="kroomtitle">Убежище «Север» · кухня и обеденный зал</span></div>
-<div class="ktabs"><button data-ktab="production" class="active">🍳 Производство</button><button data-ktab="recipes">📖 Рецепты</button><button data-ktab="settings">⚙️ Настройки</button></div>
-<div id="kProduction" class="ksection"><h3>Приготовление</h3><div id="kQueue"></div><div id="kProductionInfo"></div></div>
+<div class="ktabs"><button data-ktab="production" class="active">🍳 Очередь</button><button data-ktab="recipes">📖 Рецепты</button><button data-ktab="settings">⚙️ Настройки</button></div>
+<div id="kProduction" class="ksection"><h3>Приготовление</h3><div id="kQueue"></div><button id="chooseRecipe" type="button">＋ Выбрать блюдо</button><div id="finishedMeals"></div></div>
 <div id="kRecipes" class="ksection" hidden><h3>Книга рецептов</h3><div id="kRecipeHolder"></div></div>
 <div id="kSettings" class="ksection" hidden><h3>Режим работы столовой</h3><div id="kSettingsInfo"></div></div>
 <div class="kfoot">Кухня работает сама. Продукты списываются при постановке в очередь; готовые блюда поступают на склад после окончания таймера.</div>
 </div><script>
-const C=document.getElementById('game'),ctx=C.getContext('2d'),W=16,H=12,S=50;const defs={tower:{name:'Башня',icon:'🎯',cost:[0,35,25]},trap:{name:'Ловушка',icon:'🪤',cost:[0,15,5]},farm:{name:'Ферма',icon:'🌱',cost:[0,30,0]},scrap:{name:'Мастерская',icon:'🔧',cost:[0,25,15]},house:{name:'Жильё',icon:'🏠',cost:[20,40,0]},wall:{name:'Баррикада',icon:'🧱',cost:[0,15,0]},remove:{name:'Убрать',icon:'✖',cost:[0,0,0]}};let selected='tower',state;const initialSettlers=()=>[{id:1,name:'Анна',role:'Фельдшер',skill:2,health:100,status:'дома'},{id:2,name:'Виктор',role:'Механик',skill:3,health:100,status:'дома'},{id:3,name:'Марина',role:'Агроном',skill:2,health:100,status:'дома'},{id:4,name:'Егор',role:'Охотник',skill:7,health:100,status:'дома'},{id:5,name:'Лена',role:'Разведчица',skill:6,health:100,status:'дома'}];const seed=()=>({day:1,food:120,wood:160,metal:90,people:5,hp:100,settlers:initialSettlers(),expeditions:[],log:[],buildings:[{x:6,y:5,t:'hq'},{x:5,y:4,t:'farm'},{x:8,y:5,t:'house'},{x:7,y:7,t:'scrap'},{x:3,y:4,t:'tower'},{x:12,y:6,t:'trap'}],zombies:[],wave:0});try{state=JSON.parse(localStorage.getItem('laststand_v08')||localStorage.getItem('laststand_v05')||localStorage.getItem('laststand_v01'))||seed()}catch{state=seed()}if(!Array.isArray(state.settlers)){state.settlers=initialSettlers();state.expeditions=[];state.log=[];state.people=state.settlers.length}state.expeditions ||= [];state.log ||= [];const inside=(x,y)=>x>=4&&x<=10&&y>=3&&y<=8;const occupied=(x,y)=>state.buildings.some(b=>b.x===x&&b.y===y);const $=id=>document.getElementById(id);const save=()=>{try{localStorage.setItem('laststand_v08',JSON.stringify(state))}catch{}};const msg=t=>$('message').textContent=t;function renderUI(){state.people=state.settlers.filter(p=>p.health>0).length;for(let k of ['food','wood','metal','people','hp'])$(k).textContent=state[k];$('day').textContent='День '+state.day;$('wave').textContent=state.wave?'Набегов: '+state.wave:'Угроза: низкая';document.querySelectorAll('.tool').forEach(el=>el.classList.toggle('active',el.dataset.t===selected))}const TW=54,TH=27,OX=400,OY=100;
+const C=document.getElementById('game'),ctx=C.getContext('2d'),W=24,H=16,S=50;const defs={tower:{name:'Башня',icon:'🎯',cost:[0,35,25]},trap:{name:'Ловушка',icon:'🪤',cost:[0,15,5]},farm:{name:'Ферма',icon:'🌱',cost:[0,30,0]},scrap:{name:'Мастерская',icon:'🔧',cost:[0,25,15]},house:{name:'Жильё',icon:'🏠',cost:[20,40,0]},wall:{name:'Баррикада',icon:'🧱',cost:[0,15,0]},remove:{name:'Убрать',icon:'✖',cost:[0,0,0]}};let selected='tower',state;const initialSettlers=()=>[{id:1,name:'Анна',role:'Фельдшер',skill:2,health:100,status:'дома'},{id:2,name:'Виктор',role:'Механик',skill:3,health:100,status:'дома'},{id:3,name:'Марина',role:'Агроном',skill:2,health:100,status:'дома'},{id:4,name:'Егор',role:'Охотник',skill:7,health:100,status:'дома'},{id:5,name:'Лена',role:'Разведчица',skill:6,health:100,status:'дома'}];const seed=()=>({day:1,food:120,wood:160,metal:90,people:5,hp:100,settlers:initialSettlers(),expeditions:[],log:[],buildings:[{x:6,y:5,t:'hq'},{x:5,y:4,t:'farm'},{x:8,y:5,t:'house'},{x:7,y:7,t:'scrap'},{x:3,y:4,t:'tower'},{x:12,y:6,t:'trap'}],zombies:[],wave:0});try{state=JSON.parse(localStorage.getItem('laststand_v08')||localStorage.getItem('laststand_v05')||localStorage.getItem('laststand_v01'))||seed()}catch{state=seed()}if(!Array.isArray(state.settlers)){state.settlers=initialSettlers();state.expeditions=[];state.log=[];state.people=state.settlers.length}state.expeditions ||= [];state.log ||= [];const inside=(x,y)=>x>=4&&x<=10&&y>=3&&y<=8;const occupied=(x,y)=>state.buildings.some(b=>b.x===x&&b.y===y);const $=id=>document.getElementById(id);const save=()=>{try{localStorage.setItem('laststand_v08',JSON.stringify(state))}catch{}};const msg=t=>$('message').textContent=t;function renderUI(){state.people=state.settlers.filter(p=>p.health>0).length;for(let k of ['food','wood','metal','people','hp'])$(k).textContent=state[k];$('day').textContent='День '+state.day;$('wave').textContent=state.wave?'Набегов: '+state.wave:'Угроза: низкая';document.querySelectorAll('.tool').forEach(el=>el.classList.toggle('active',el.dataset.t===selected))}const TW=54,TH=27,OX=400,OY=100;
 let zoom=1,panX=0,panY=0,preview=null;
 function diamond(x,y,fill,stroke){ctx.beginPath();ctx.moveTo(x,y-TH/2);ctx.lineTo(x+TW/2,y);ctx.lineTo(x,y+TH/2);ctx.lineTo(x-TW/2,y);ctx.closePath();ctx.fillStyle=fill;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=.65;ctx.stroke()}}
 function poly(pts,color,stroke){ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.closePath();ctx.fillStyle=color;ctx.fill();if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.3;ctx.stroke()}}
@@ -387,6 +393,20 @@ const RECIPE_BASE=[
 ['Мясной пирог',5,3,{'Мука':3,'Мясо':3,'Лук':1,'Масло':1},28],['Овощной пирог',5,3,{'Мука':3,'Капуста':2,'Масло':1},23],['Фаршированный перец',5,3,{'Перец':2,'Мясо':2,'Гречиха':1},25],['Запеканка из картофеля',4,3,{'Картофель':3,'Мясо':1,'Масло':1},22],['Тыквенный пирог',5,3,{'Тыква':3,'Мука':2,'Масло':1},23],['Сложное овощное рагу',5,3,{'Баклажан':1,'Перец':1,'Томат':2,'Фасоль':1},22],['Праздничное жаркое',6,3,{'Мясо':4,'Картофель':2,'Лук':1,'Морковь':1},34],['Хлеб с чесноком',4,3,{'Мука':2,'Чеснок':1,'Масло':1},18],['Пирог с клубникой',5,3,{'Клубника':3,'Мука':2,'Масло':1},22],['Пирог с малиной',5,3,{'Малина':3,'Мука':2,'Масло':1},22],['Тушёная чечевица с мясом',4,3,{'Чечевица':2,'Мясо':2,'Лук':1},23],['Овощная лазанья',7,3,{'Баклажан':2,'Томат':2,'Мука':2,'Масло':1},27],['Капустные голубцы',6,3,{'Капуста':2,'Мясо':2,'Гречиха':1},26],['Пшеничный пирог с овощами',5,3,{'Пшеница':3,'Кабачок':2,'Лук':1},22]
 ];
 const RECIPES=RECIPE_BASE.map(([name,level,kitchen,ingredients,food])=>({name,level,kitchen,ingredients,food}));
+if (!state.testStock022) {
+  state.wood+=10000;
+  state.metal+=10000;
+  state.food+=5000;
+  for (const crop of CROPS) {
+    ag.produce[crop.name]=(ag.produce[crop.name]||0)+250;
+    ag.seeds[crop.name]=(ag.seeds[crop.name]||0)+100;
+  }
+  for (const name of new Set(RECIPES.flatMap(r=>Object.keys(r.ingredients)))) {
+    if (!(name in ag.produce)) ck.pantry[name]=(ck.pantry[name]||0)+500;
+  }
+  state.testStock022=true;
+  save();
+}
 function pantryAmount(name){return name in ag.produce?(ag.produce[name]||0):(ck.pantry[name]||0)}
 function changePantry(name,n){if(name in ag.produce)ag.produce[name]+=n;else ck.pantry[name]=(ck.pantry[name]||0)+n}
 function chefPerson(){return state.settlers.find(p=>p.id===Number(ck.chef)&&p.health>0&&p.status==='дома')}
@@ -394,7 +414,23 @@ function chefLevel(){return 10}
 function canCook(r){return chefLevel()>=r.level&&ck.kitchen>=r.kitchen&&Object.entries(r.ingredients).every(([k,n])=>pantryAmount(k)>=n)}
 function cookRecipe(i){let r=RECIPES[i];if(!r)return;if(!canCook(r))return msg('Не хватает ингредиентов или уровня кухни.');if(!Array.isArray(ck.queue))ck.queue=[];if(ck.queue.length>=5)return msg('Очередь кухни заполнена (5 блюд).');for(const [k,n] of Object.entries(r.ingredients))changePantry(k,-n);const duration=10*minute;const start=Math.max(Date.now(),ck.queue.length?ck.queue[ck.queue.length-1].end:0);ck.queue.push({recipe:i,start,end:start+duration});logEvent('На кухне начали готовить «'+r.name+'».');update();renderCooking();renderKitchenQueue()}
 function renderCooking(){renderFoodStocks();let p=chefPerson(),level=chefLevel();$('cookStatus').textContent='Кухня '+ck.kitchen+'/3 · Работает автоматически · доступный уровень '+level+' · рецептов '+RECIPES.length+' · запас: '+Object.entries(ck.pantry).map(([k,v])=>k+' '+v).join(', ');
-let filter=$('recipeFilter').value,container=$('recipes');container.replaceChildren();RECIPES.forEach((r,i)=>{let ready=canCook(r),unlocked=level>=r.level&&ck.kitchen>=r.kitchen;if(filter==='ready'&&!ready||filter==='locked'&&unlocked)return;let card=document.createElement('div');card.className='recipe';let title=document.createElement('b');title.textContent=r.name;card.append(title);let d=document.createElement('small');d.textContent='Рецепт '+r.level+' · кухня '+r.kitchen+' · еда +'+r.food;card.append(d);let ing=document.createElement('small');ing.textContent=Object.entries(r.ingredients).map(([k,n])=>k+' '+pantryAmount(k)+'/'+n).join(' · ');card.append(ing);let btn=document.createElement('button');btn.textContent=ready?'Приготовить':!unlocked?'🔒 Закрыто':'Нет продуктов';btn.disabled=!ready;btn.onclick=()=>cookRecipe(i);card.append(btn);container.append(card)});$('mealStock').textContent='🍽️ Приготовлено: '+(Object.entries(ck.meals).filter(([k,v])=>v>0).map(([k,v])=>k+' ×'+v).join(' · ')||'пока нет блюд')}
+const filter=$('recipeFilter').value, container=$('recipes');
+container.replaceChildren();
+RECIPES.forEach((r,i)=>{
+  const ready=canCook(r), unlocked=level>=r.level && ck.kitchen>=r.kitchen;
+  if ((filter==='ready'&&!ready)||(filter==='locked'&&unlocked)) return;
+  const card=document.createElement('article'),title=document.createElement('b'),ingredients=document.createElement('small'),btn=document.createElement('button');
+  card.className='recipe';
+  title.textContent=r.name;
+  ingredients.textContent=Object.entries(r.ingredients).map(([name,qty])=>name+' ×'+qty).join(' · ');
+  btn.disabled=!ready || (ck.queue?.length||0)>=5;
+  btn.textContent=!unlocked?'🔒 Кухня '+r.kitchen+' · повар '+r.level:!ready?'Мало припасов':btn.disabled?'Очередь полна':'＋ Готовить · 10 мин';
+  btn.onclick=()=>{cookRecipe(i);if(document.getElementById('kitchenScreen').classList.contains('open')) kitchenTab('production')};
+  card.append(title,ingredients,btn); container.append(card);
+});
+if(!container.childElementCount)container.textContent=filter==='ready'?'Сейчас нет доступных блюд. Выбери «Все рецепты», чтобы посмотреть требования.':'Нет рецептов по этому фильтру.';
+renderKitchenUpgrade();
+$('mealStock').textContent='🍽️ Приготовлено: '+(Object.entries(ck.meals).filter(([k,v])=>v>0).map(([k,v])=>k+' ×'+v).join(' · ')||'пока нет блюд')}
 let chefs=$('chef');for(let p of state.settlers){let opt=document.createElement('option');opt.value=p.id;opt.textContent=p.name+' · '+p.role;chefs.append(opt)}chefs.value=String(ck.chef);chefs.onchange=()=>{ck.chef=Number(chefs.value);update()};$('kitchen').value=String(ck.kitchen);$('kitchen').disabled=true;
 $('upgradeKitchen').onclick=()=>{if(ck.kitchen>=3)return msg('Кухня уже максимального уровня.');let cost=ck.kitchen===1?[40,15]:[80,40];if(state.wood<cost[0]||state.metal<cost[1])return msg('Не хватает материалов или металла.');state.wood-=cost[0];state.metal-=cost[1];ck.kitchen++;$('kitchen').value=String(ck.kitchen);logEvent('Кухня улучшена до уровня '+ck.kitchen);update()};$('recipeFilter').onchange=renderCooking;
 const cookOldUpdate=update;update=function(){cookOldUpdate();renderCooking()};
@@ -472,35 +508,6 @@ document.getElementById('modeView').onclick=()=>changeMapMode('view');
 document.getElementById('modeBuild').onclick=()=>changeMapMode('build');
 
 
-/* Compact recipe catalogue: select a node to inspect ingredients and cook. */
-const renderCookingBeforeCompact=renderCooking;
-renderCooking=function(){
- renderCookingBeforeCompact();
- const nodes=[...document.querySelectorAll('#recipes .recipe')];
- nodes.forEach((card)=>{
-  const original=card.querySelector('button');
-  if(!original)return;
-  const unlocked=original.textContent.indexOf('Закрыто')<0;
-  const ready=!original.disabled;
-  card.classList.toggle('recipe-locked',!unlocked);
-  card.classList.toggle('recipe-ready',ready);
-  card.setAttribute('role','button');card.tabIndex=0;
-  const show=()=>{
-   const details=document.getElementById('recipeDetails');details.replaceChildren();
-   const heading=document.createElement('h3');heading.textContent=card.querySelector('b')?.textContent||'Рецепт';details.append(heading);
-   card.querySelectorAll('small').forEach(el=>{const p=document.createElement('p');p.textContent=el.textContent;details.append(p)});
-   const cook=document.createElement('button');cook.textContent=original.textContent;cook.disabled=original.disabled;cook.onclick=()=>{original.click();details.hidden=true};details.append(cook);
-   const close=document.createElement('button');close.textContent='Закрыть';close.onclick=()=>details.hidden=true;details.append(close);
-   details.hidden=false;
-  };
-  card.onclick=show;card.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}};
- });
-};
-renderCooking();
-
-
-
-/* 0.12: readable recipe actions and functional equipment upgrade */
 function renderKitchenUpgrade(){
  const root=document.getElementById('kUpgradePanel');if(!root)return;
  root.replaceChildren();
@@ -515,23 +522,6 @@ function renderKitchenUpgrade(){
  root.append(btn);
  if(btn.disabled){const note=document.createElement('p');note.textContent='Не хватает ресурсов для улучшения.';root.append(note)}
 }
-const originalRenderCooking012=renderCooking;
-renderCooking=function(){
- originalRenderCooking012();
- document.querySelectorAll('#recipes .recipe').forEach((card,i)=>{
-  const btn=card.querySelector('button');if(!btn)return;
-  const name=card.querySelector('b')?.textContent||'Блюдо';
-  const r=RECIPES.find(x=>x.name===name);
-  const ready=r&&canCook(r);
-  const unlocked=r&&ck.kitchen>=r.kitchen;
-  card.classList.toggle('kready',!!ready);
-  card.classList.toggle('klocked',!unlocked);
-  btn.textContent=ready?'＋ В очередь':!unlocked?'🔒 Кухня '+r.kitchen:'Недостаточно продуктов';
-  btn.disabled=!ready;
-  btn.onclick=e=>{e.stopPropagation();if(r) cookRecipe(RECIPES.indexOf(r));};
- });
- renderKitchenUpgrade();
-};
 /* 0.11 persistent real-time cooking queue */
 if(!Array.isArray(ck.queue))ck.queue=[];
 function settleKitchenQueue(){
@@ -540,14 +530,14 @@ function settleKitchenQueue(){
   const item=ck.queue.shift(),recipe=RECIPES[item.recipe];
   if(recipe){ck.meals[recipe.name]=(ck.meals[recipe.name]||0)+1;logEvent('Готово: «'+recipe.name+'» (+1 порция).');done=true}
  }
- if(done){update();if(kitchenScreen.classList.contains('open'))renderCooking()}
+ if(done){update();$('finishedMeals').textContent=$('mealStock').textContent}
 }
 function kitchenClock(ms){const sec=Math.max(0,Math.ceil(ms/1000));return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
 function renderKitchenQueue(){
  const root=document.getElementById('kQueue');if(!root)return;
  root.replaceChildren();
  const heading=document.createElement('h3');heading.textContent='🔥 Очередь приготовления · '+ck.queue.length+'/5';root.append(heading);
- if(!ck.queue.length){const p=document.createElement('p');p.textContent='Кухня свободна. Выбери блюдо ниже — приготовление начнётся автоматически.';root.append(p);return}
+ if(!ck.queue.length){const p=document.createElement('p');p.textContent='Очередь пуста.';root.append(p);return}
  ck.queue.forEach((item,index)=>{
   const r=RECIPES[item.recipe];if(!r)return;
   const block=document.createElement('div');block.className='kqueueitem';
@@ -570,23 +560,26 @@ function kitchenTab(tab){
  }
  document.querySelectorAll('[data-ktab]').forEach(b=>b.classList.toggle('active',b.dataset.ktab===tab));
  if(tab==='recipes')document.getElementById('kRecipeHolder').append(document.getElementById('cooking'));
- if(tab==='production')document.getElementById('kProductionInfo').append(document.getElementById('cooking'));
-  document.getElementById('cooking').classList.remove('game-tab-hidden');
+ if(tab==='production') $('finishedMeals').textContent=$('mealStock').textContent;
+  document.getElementById('cooking').classList.toggle('game-tab-hidden',tab!=='recipes');
   renderKitchenQueue();
 }
-function openKitchen(tab='production'){
+function openKitchen(tab=ck.queue.length?'production':'recipes'){
  document.getElementById('objectPanel').hidden=true;
+ $('kSettingsInfo').prepend($('chef').closest('label'));
  kitchenScreen.classList.add('open');
  kitchenTab(tab);
  renderCooking();
  kitchenScreen.scrollTop=0;
 }
 function closeKitchen(){
+ $('kitchen').closest('.cookrow').prepend($('chef').closest('label'));
  kitchenScreen.classList.remove('open');
  document.getElementById('recipeDetails').hidden=true;
  originalCookingParent.insertBefore(document.getElementById('cooking'),originalCookingNext);
   document.getElementById('cooking').classList.toggle('game-tab-hidden',activeTab!=='farm');
 }
+$('chooseRecipe').onclick=()=>kitchenTab('recipes');
 document.getElementById('kBack').onclick=closeKitchen;
 document.querySelectorAll('[data-ktab]').forEach(b=>b.onclick=()=>kitchenTab(b.dataset.ktab));
 const kitchenSettings=document.getElementById('kSettingsInfo');
