@@ -1,0 +1,42 @@
+/* Shared shelter interiors: salvaged plate, recessed trays and riveted fittings. */
+:root {
+  --case-face: linear-gradient(115deg,#191817ad,#24212099 55%,#191817bd),url("steel.png") center/760px auto;
+  --case-head: linear-gradient(105deg,#17161466,#29251d88),url("steel.png") center top/cover;
+  --tray: linear-gradient(145deg,#34312d,#242324 70%);
+  --case-edge: #594c40;
+  --inset: inset 0 2px 4px #08080988,inset 0 -1px #72655555;
+  --stud: radial-gradient(circle at 6px 6px,#a39682 0 1px,#443931 1.5px 2.6px,transparent 3px);
+}
+body {background:#161616}
+.wrap:not([data-screen="base"]) {background:var(--case-face)}
+:is(#world,#agriculture,#nutrition,#cooking,.wrap>.expeditions,#buildCatalog.open,#kitchenScreen.open,#objectPanel,#supplyList) {
+  background:var(--case-face);color:#f5ecdc;border:3px solid var(--case-edge);border-radius:5px;
+  box-shadow:inset 0 1px #8c786344,inset 0 0 0 2px #151414,0 6px 18px #09090980;
+}
+.wrap>section:is(#world,#agriculture,#nutrition,.expeditions) {background:var(--case-face);border:3px solid var(--case-edge)}
+#nutrition h2,#world h2,#agriculture .farmHead,.expeditions>.section,#kitchenScreen .khead,#buildCatalog .buildhead,#objectPanel .objectHead {
+  background:var(--stud),var(--case-head);border:0;border-left:5px solid #91704c;border-bottom:3px ridge #615247;color:#f3dfba;padding:10px 13px;
+}
+:is(#agriculture,#nutrition,#world,.expeditions,#cooking,#kitchenScreen,#buildCatalog,#objectPanel) :is(.plots,.peoplegrid,.store,.inventory,.missions,.expform,.settlers,.siteinfo,.story,.expLog,.buildtiles,.ksection,.objectBody,.stockRows,.cookrow,.controls,.note,.meal) {
+  background:linear-gradient(115deg,#211f1e,#191a1c);border:2px solid #403930;border-radius:4px;box-shadow:var(--inset);color:#e9e0d2;
+}
+#agriculture #plots,#nutrition .peoplegrid {padding:8px;background:#1d1c1b;border:2px solid #494139;gap:8px}
+#agriculture .plot,#nutrition .person,.expeditions :is(.settler,.mission),#buildCatalog .buildtile,#kitchenScreen :is(#dishInfo,#kUpgradePanel,.treeStage,.treeDish,.stockRows>div,.queuePair),#kitchenScreen #recipes button,#harvestInventory section {
+  background:var(--stud),var(--tray);border:2px solid #50473e;border-top-color:#6a5d4e;border-radius:3px;color:#eee4d6;box-shadow:inset 0 -2px #141314,0 2px 3px #10101080;
+}
+#harvestInventory section {padding:10px}#harvestInventory section div {border-bottom-color:#4a4239}
+#world .worldmap {border:4px ridge #605449}
+#world .worldmap .worldhud,#world .worldlegend,#dietStore,#dietSummary,#radioStatus {background:#282423f2;border:2px solid #5d5145;color:#eddeca}
+#agriculture .agrow,#nutrition .controls,.expeditions .expform {padding:9px;background:linear-gradient(100deg,#2e2a27,#252426);border-left:3px solid #75604b}
+#kitchenScreen .ksection,#buildCatalog .buildtiles,#kitchenScreen #cooking {background:var(--case-face);border:2px solid var(--case-edge);box-shadow:var(--inset)}
+#objectPanel .objectTabs,#agriculture .farmTabs,#kitchenScreen .ktabs {background:#191819;border:2px solid #4c4339;gap:2px}
+:is(#agriculture,#nutrition,#world,.expeditions,#cooking,#buildCatalog,#kitchenScreen,#objectPanel) :is(button,select),#returnBase,#world .worldcontrols button,#kitchenScreen .ksection :is(button,select),#agriculture .farmTabs button,#objectPanel .objectTabs button {
+  background:linear-gradient(#48423a,#302d2a);border:2px outset #6d6050;border-radius:3px;color:#f1e7d7;box-shadow:inset 0 1px #b9a78a22;
+}
+#kitchenScreen .ktabs button.active,#agriculture .farmTabs button[aria-pressed=true],#objectPanel .objectTabs button[aria-pressed=true],#kitchenScreen #recipes button[aria-pressed=true],#kitchenScreen #dishCategories button[aria-pressed=true],#kitchenScreen #chooseRecipe:enabled {
+  background:linear-gradient(#66523b,#463a2c);border-color:#9a7952;color:#ffedc9;box-shadow:inset 0 -2px #c39b65;
+}
+#kitchenScreen button:disabled,#buildCatalog .unaffordable {filter:saturate(.35);opacity:.73}
+#agriculture .plot .progress {background:#171619}#agriculture .plot .progress i {background:#ad905e}
+#kitchenScreen select option,.wrap select option {background:#292724;color:#f0e9dc}
+@media(max-width:520px){#agriculture #plots,#nutrition .peoplegrid{padding:5px}.wrap>section:is(#world,#agriculture,#nutrition,.expeditions){padding:8px}}
