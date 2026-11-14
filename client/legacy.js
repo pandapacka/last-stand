@@ -1,3 +1,6 @@
+import {RECIPES} from '../shared/recipes.ts';
+import {chefLevel,canPrepare,ingredientCount} from '../shared/kitchen.ts';
+import {enqueueDish,finishDishes,settleWorkshops} from '../server/production.ts';
 import {readSave,saveKey} from './storage.ts';
 import Phaser from 'phaser';
 import {Shelter,cellAt,point} from './Shelter.ts';
@@ -173,14 +176,7 @@ function renderFoodStocks(){
 }
 document.addEventListener('click',e=>{if(!$('supplies').contains(e.target))$('supplies').open=false});
 
-const RECIPE_BASE=[
-['Печёный картофель',1,1,{'Картофель':2},6],['Варёная морковь',1,1,{'Морковь':2,'Вода':1},5],['Свекольный отвар',1,1,{'Свёкла':2,'Вода':2},5],['Кукуруза на углях',1,1,{'Кукуруза':2},6],['Жареные кабачки',1,1,{'Кабачок':2,'Масло':1},7],['Овсяная каша',1,1,{'Овёс':2,'Вода':1},7],['Гречневая каша',1,1,{'Гречиха':2,'Вода':1},7],['Похлёбка из репы',1,1,{'Репа':2,'Вода':2},6],['Гороховая похлёбка',1,1,{'Горох':2,'Вода':2},7],['Овощи на углях',1,1,{'Перец':1,'Томат':1},7],
-['Картофельный суп',2,2,{'Картофель':2,'Морковь':1,'Вода':2},11],['Щи',2,2,{'Капуста':2,'Морковь':1,'Вода':2},12],['Борщ',2,2,{'Свёкла':2,'Капуста':1,'Картофель':1,'Вода':2},15],['Гороховый суп',2,2,{'Горох':2,'Картофель':1,'Вода':2},12],['Чечевичная похлёбка',2,2,{'Чечевица':2,'Лук':1,'Вода':2},12],['Тушёная капуста',2,2,{'Капуста':2,'Лук':1,'Масло':1},12],['Рагу из кабачков',2,2,{'Кабачок':2,'Томат':1,'Лук':1},13],['Картофельное пюре',2,2,{'Картофель':3,'Масло':1},12],['Грибной суп',2,2,{'Вешенки':2,'Картофель':1,'Вода':2},13],['Томатный суп',2,2,{'Томат':3,'Вода':2},11],
-['Гречка с мясом',3,2,{'Гречиха':2,'Мясо':2,'Вода':1},18],['Тушёное мясо',3,2,{'Мясо':3,'Лук':1,'Вода':1},19],['Картофель с мясом',3,2,{'Картофель':2,'Мясо':2,'Лук':1},19],['Овощное рагу',3,2,{'Картофель':1,'Кабачок':1,'Морковь':1,'Томат':1},14],['Фасолевое рагу',3,2,{'Фасоль':2,'Томат':1,'Лук':1},15],['Каша с тыквой',3,2,{'Тыква':2,'Овёс':1,'Вода':1},14],['Пшённая каша с тыквой',3,2,{'Тыква':2,'Вода':2,'Масло':1},12],['Запечённая свёкла',3,2,{'Свёкла':2,'Масло':1},12],['Тушёные баклажаны',3,2,{'Баклажан':2,'Томат':1},14],['Овощной гарнир',3,2,{'Брокколи':1,'Цветная капуста':1,'Морковь':1},14],
-['Хлеб ржаной',3,2,{'Рожь':3,'Вода':2,'Соль':1},18],['Хлеб пшеничный',3,2,{'Пшеница':3,'Вода':2,'Соль':1},18],['Лепёшка',2,2,{'Мука':2,'Вода':1},12],['Запечённая тыква',2,2,{'Тыква':2},11],['Печёный пастернак',2,2,{'Пастернак':2,'Масло':1},11],['Томатная подлива',3,2,{'Томат':2,'Лук':1},9],['Суп из брокколи',3,2,{'Брокколи':2,'Картофель':1,'Вода':2},13],['Фасолевый суп',3,2,{'Фасоль':2,'Морковь':1,'Вода':2},13],['Капустный суп с мясом',3,2,{'Капуста':2,'Мясо':2,'Вода':2},19],['Овсяная лепёшка',3,2,{'Овёс':2,'Вода':1,'Масло':1},13],
-['Мясной пирог',5,3,{'Мука':3,'Мясо':3,'Лук':1,'Масло':1},28],['Овощной пирог',5,3,{'Мука':3,'Капуста':2,'Масло':1},23],['Фаршированный перец',5,3,{'Перец':2,'Мясо':2,'Гречиха':1},25],['Запеканка из картофеля',4,3,{'Картофель':3,'Мясо':1,'Масло':1},22],['Тыквенный пирог',5,3,{'Тыква':3,'Мука':2,'Масло':1},23],['Сложное овощное рагу',5,3,{'Баклажан':1,'Перец':1,'Томат':2,'Фасоль':1},22],['Праздничное жаркое',6,3,{'Мясо':4,'Картофель':2,'Лук':1,'Морковь':1},34],['Хлеб с чесноком',4,3,{'Мука':2,'Чеснок':1,'Масло':1},18],['Пирог с клубникой',5,3,{'Клубника':3,'Мука':2,'Масло':1},22],['Пирог с малиной',5,3,{'Малина':3,'Мука':2,'Масло':1},22],['Тушёная чечевица с мясом',4,3,{'Чечевица':2,'Мясо':2,'Лук':1},23],['Овощная лазанья',7,3,{'Баклажан':2,'Томат':2,'Мука':2,'Масло':1},27],['Капустные голубцы',6,3,{'Капуста':2,'Мясо':2,'Гречиха':1},26],['Пшеничный пирог с овощами',5,3,{'Пшеница':3,'Кабачок':2,'Лук':1},22]
-];
-const RECIPES=RECIPE_BASE.map(([name,level,kitchen,ingredients,food])=>({name,level,kitchen,ingredients,food}));
+
 if (!state.testStock022) {
   state.wood+=10000;
   state.metal+=10000;
@@ -195,12 +191,15 @@ if (!state.testStock022) {
   state.testStock022=true;
   save();
 }
-function pantryAmount(name){return name in ag.produce?(ag.produce[name]||0):(ck.pantry[name]||0)}
-function changePantry(name,n){if(name in ag.produce)ag.produce[name]+=n;else ck.pantry[name]=(ck.pantry[name]||0)+n}
+function pantryAmount(name){return ingredientCount(state,name)}
 function chefPerson(){return state.settlers.find(p=>p.id===Number(ck.chef)&&p.health>0&&p.status==='дома')}
-function chefLevel(){return 10}
-function canCook(r){return chefLevel()>=r.level&&ck.kitchen>=r.kitchen&&Object.entries(r.ingredients).every(([k,n])=>pantryAmount(k)>=n)}
-function cookRecipe(i){let r=RECIPES[i];if(!r)return;if(!canCook(r))return msg('Не хватает ингредиентов или уровня кухни.');if(!Array.isArray(ck.queue))ck.queue=[];if(ck.queue.length>=5)return msg('Очередь кухни заполнена (5 блюд).');for(const [k,n] of Object.entries(r.ingredients))changePantry(k,-n);const duration=10*minute;const start=Math.max(Date.now(),ck.queue.length?ck.queue[ck.queue.length-1].end:0);ck.queue.push({recipe:i,start,end:start+duration});logEvent('На кухне начали готовить «'+r.name+'».');update();renderCooking();renderKitchenQueue()}
+function canCook(recipe){return canPrepare(state,recipe)}
+function cookRecipe(i){
+  const error=enqueueDish(state,i);
+  if(error)return msg(error);
+  logEvent('На кухне начали готовить «'+RECIPES[i].name+'».');
+  update();renderKitchenQueue();
+}
 const mealSatiety=18;
 const dishGroups=['Все','Супы','Напитки','Горячее','Каши','Выпечка'];
 let dishGroup='Все', selectedDish=0;
@@ -395,12 +394,9 @@ function renderKitchenUpgrade(){
 /* 0.11 persistent real-time cooking queue */
 if(!Array.isArray(ck.queue))ck.queue=[];
 function settleKitchenQueue(){
- const now=Date.now();let done=false;
- while(ck.queue.length&&Number(ck.queue[0].end)<=now){
-  const item=ck.queue.shift(),recipe=RECIPES[item.recipe];
-  if(recipe){ck.meals[recipe.name]=(ck.meals[recipe.name]||0)+1;logEvent('Готово: «'+recipe.name+'» (+1 порция).');done=true}
- }
- if(done)update();
+  const meals=finishDishes(state);
+  for(const name of meals)logEvent('Готово: «'+name+'» (+1 порция).');
+  if(meals.length)update();
 }
 function kitchenClock(ms){const sec=Math.max(0,Math.ceil(ms/1000));return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
 function setDishPicker(open){
@@ -670,14 +666,8 @@ document.querySelector('.toolbar').classList.add('game-tab-hidden');
 
 // Deadlines belong to individual jobs. Polling only reconciles elapsed deadlines.
 function reconcileJobs(){
-  const now=Date.now();let changed=false;
-  for(const b of state.buildings){
-    if(b.buildEnd&&b.buildEnd<=now){if(b.t==='scrap')b.outputAt=b.buildEnd+15*minute;delete b.buildEnd;changed=true}
-    if(b.t==='scrap'&&completed(b)){
-      if(!b.outputAt){b.outputAt=now+15*minute;changed=true}
-      if(b.outputAt<=now){const batches=1+Math.floor((now-b.outputAt)/(15*minute));state.wood+=12*batches;state.metal+=5*batches;b.outputAt+=batches*15*minute;changed=true}
-    }
-  }
+  const now=Date.now();
+  let changed=settleWorkshops(state,now);
   for(const p of state.settlers){
     if(p.health<=0)continue;
     if(!p.mealAt){p.mealAt=now+(55+p.id)*minute;changed=true}
