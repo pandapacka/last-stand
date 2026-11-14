@@ -48,3 +48,5 @@ body {background:#161616}
 .worldOrders{position:absolute;top:6px;left:6px;z-index:4;display:grid;gap:3px;max-width:min(45%,215px);pointer-events:none}.worldOrders>div{display:grid;background:#211f1ded;border-left:3px solid #ab8960;color:#e9e0cf;padding:3px 7px;font:11px/1.2 system-ui}.worldOrders b{color:#f4d49c}.worldOrders small{font-size:10px}
 
 .worldOrders button{pointer-events:auto;justify-self:start;font-size:11px;padding:3px 6px}.mission button{margin-left:6px}
+
+.cellWheel[data-build="true"] button:first-child{left:0;top:-48px;min-width:84px}

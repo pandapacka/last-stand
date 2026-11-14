@@ -549,6 +549,8 @@ $('worldMap').onclick=()=>openTab('world');
 const worldRenderBefore13=renderWorld;
 let worldPan={x:0,y:0},worldScale=1;
 function worldHash(x,y){let n=Math.sin(x*127.1+y*311.7)*43758.5453;return n-Math.floor(n)}
+let worldBuildHits=[];
+function pendingBuild(cell){return state.expeditions.find(e=>e.action==='build'&&e.cell&&cellKey(e.cell)===cellKey(cell)&&(e.doneAt??e.arriveAt)>Date.now())}
 function worldCanvasDraw(){
  const el=document.getElementById('worldmap'),canvas=el.querySelector('canvas');if(!canvas)return;
  const width=el.clientWidth,height=el.clientHeight,dpr=Math.min(2,window.devicePixelRatio||1);
@@ -591,6 +593,7 @@ function worldCanvasDraw(){
  const knownSites=registerSites();
  for(const key of new Set([...Object.keys(knownSites),...(state.world.posts||[])])){const [x,y]=key.split(',').map(Number);const [px,py]=pt(x,y);paintSprite(c,knownSites[key]||'tower',px,py+3*worldScale,24*worldScale)}
  const homePos=pt(-1,1);paintSprite(c,'hq',homePos[0],homePos[1]+3*worldScale,28*worldScale);
+ worldBuildHits=[];
  // Real-time expedition markers move along the route, including after page reload.
  for(const expedition of state.expeditions){
   if(!expedition.departAt||!expedition.arriveAt)continue;
@@ -623,6 +626,7 @@ function worldCanvasDraw(){
   c.save();c.translate(px,py);if((d[0]<h[0])!==returning)c.scale(-1,1);
   paintSprite(c,'traveler',0,0,Math.max(7,10*worldScale));c.restore();
   c.textAlign='center';const badge=label+' '+kitchenClock(deadline-now);c.font='bold 12px system-ui';const bw=c.measureText(badge).width+8;c.fillStyle='#201f1b';c.fillRect(px-bw/2,py+10,bw,18);c.fillStyle='#ffdfa1';c.fillText(badge,px,py+23);
+  if(work)worldBuildHits.push({x:px-bw/2,y:py+10,w:bw,h:18,cell:expedition.cell},{x:d[0]-12*worldScale,y:d[1]-20*worldScale,w:24*worldScale,h:24*worldScale,cell:expedition.cell});
  }
  const orders=el.querySelector('.worldOrders');
  if(orders){
@@ -646,6 +650,7 @@ function worldCanvasDraw(){
    }
  }
  const wheel=el.querySelector('.cellWheel');
+ if(wheel&&selectedCell&&wheel.dataset.build!==String(!!pendingBuild(selectedCell))){renderWorld();return}
  if(wheel&&selectedCell){
    const [x,y]=pt(selectedCell.x,selectedCell.y);
    wheel.style.left=Math.max(90,Math.min(width-90,x))+'px';wheel.style.top=Math.max(72,Math.min(height-30,y))+'px';
@@ -657,7 +662,9 @@ renderWorld=function(){
  $('siteinfo').textContent=selectedCell?cellDescription(selectedCell):'Выберите клетку карты';
  if(selectedCell){
    const wheel=document.createElement('div');wheel.className='cellWheel';
-   for(const [action,label] of Object.entries(fieldActions)){
+   const job=pendingBuild(selectedCell);wheel.dataset.build=String(!!job);
+   if(job){wheel.append(speedButton(()=>{speedTrip(job);renderWorld()}))}
+   else for(const [action,label] of Object.entries(fieldActions)){
      const button=document.createElement('button');button.type='button';button.textContent=label;
      button.onclick=()=>openFieldOrder(selectedCell,action);wheel.append(button);
    }
@@ -717,6 +724,8 @@ worldMapEl.addEventListener('pointercancel',e=>{touches.delete(e.pointerId);move
 worldMapEl.addEventListener('pointerup',e=>{
  if(!touches.delete(e.pointerId)||moved)return;
  const pos=localWorldPoint(e);
+ const hit=worldBuildHits.findLast(h=>pos.x>=h.x&&pos.x<=h.x+h.w&&pos.y>=h.y&&pos.y<=h.y+h.h);
+ if(hit&&pendingBuild(hit.cell)){selectedCell={...hit.cell};renderWorld();return}
  const dx=(pos.x-worldMapEl.clientWidth/2-worldPan.x)/(21.5*worldScale);
  const dy=(pos.y-worldMapEl.clientHeight*.40-worldPan.y)/(11*worldScale);
  const x=Math.round((dx+dy)/2),y=Math.round((dy-dx)/2);
