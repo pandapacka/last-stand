@@ -46,3 +46,5 @@ body {background:#161616}
 .cellWheel{position:absolute;z-index:6;width:0;height:0}.cellWheel button{position:absolute;transform:translate(-50%,-50%);background:#34312c;color:#ffe6ac;border:2px solid #8f7854;border-radius:12px;padding:7px 4px;font-size:11px;min-height:38px}.cellWheel button:first-child{left:-55px;top:-13px}.cellWheel button:nth-child(2){top:-54px}.cellWheel button:last-child{left:54px;top:-13px}#fieldOrder{background:var(--case-face);color:#f6ebd5;border:3px solid var(--case-edge);width:min(420px,92vw)}#fieldOrder::backdrop{background:#10100fc9}#fieldParty label{display:block;padding:6px}#fieldOrder form{display:inline}#fieldOrder button{padding:8px 12px}
 
 .worldOrders{position:absolute;top:6px;left:6px;z-index:4;display:grid;gap:3px;max-width:min(45%,215px);pointer-events:none}.worldOrders>div{display:grid;background:#211f1ded;border-left:3px solid #ab8960;color:#e9e0cf;padding:3px 7px;font:11px/1.2 system-ui}.worldOrders b{color:#f4d49c}.worldOrders small{font-size:10px}
+
+.worldOrders button{pointer-events:auto;justify-self:start;font-size:11px;padding:3px 6px}.mission button{margin-left:6px}

@@ -94,7 +94,7 @@ function inspectTap(e){const pos=worldPointerPosition(e);const b=scene.pick(pos.
 C.addEventListener('pointerup',e=>{if(!gestureMoved&&pointers.size===1){let p=hit(e);if(window.mapMode==='view')inspectTap(e,p);else if(p.x>=0&&p.x<W&&p.y>=0&&p.y<H){if(selected==='remove')place(p.x,p.y);else{preview={...p,t:selected,rot:preview?.rot||0};syncPreview()}}}pointers.delete(e.pointerId);if(pointers.size<2)gesture=null;downAt=null});
 C.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);gesture=null;gestureMoved=true});const missions={sector:{label:'Разведка клетки',days:1,risk:.12,food:[0,10],wood:[2,10],metal:[0,4]},forest:{label:'Охота в лесу',days:1,risk:.12,food:[18,40],wood:[0,8],metal:[0,0]},scout:{label:'Разведка окрестностей',days:1,risk:.19,food:[0,12],wood:[5,18],metal:[0,5]},city:{label:'Поиск припасов в городе',days:2,risk:.42,food:[15,45],wood:[5,20],metal:[10,35]},farmstead:{label:'Заброшенная ферма',days:2,risk:.24,food:[15,30],wood:[8,24],metal:[0,8]},clinic:{label:'Медпункт',days:2,risk:.5,food:[0,8],wood:[0,4],metal:[8,20]},relay:{label:'Радиовышка',days:3,risk:.54,food:[0,8],wood:[0,10],metal:[10,24]}};
 function logEvent(text){state.log.unshift(text);state.log=state.log.slice(0,15)}
-function renderExpeditions(){$('missions').innerHTML=state.expeditions.length?state.expeditions.map(e=>'<div class="mission">'+(fieldActions[e.action]||missions[e.type].label)+(e.cell?' ('+e.cell.x+', '+e.cell.y+')':'')+' · '+e.ids.map(id=>state.settlers.find(p=>p.id===id)?.name).join(', ')+' · '+(e.arriveAt?'осталось '+Math.max(0,Math.ceil((e.arriveAt-Date.now())/60000))+' мин':'возвращение: день '+e.returnDay)+'</div>').join(''):'<small>Сейчас никто не в экспедиции.</small>';$('expLog').innerHTML=state.log.length?state.log.map(t=>'<p>'+t+'</p>').join(''):'<small>Пока нет событий.</small>'}
+function renderExpeditions(){$('missions').innerHTML=state.expeditions.length?state.expeditions.map(e=>'<div class="mission">'+(fieldActions[e.action]||missions[e.type].label)+(e.cell?' ('+e.cell.x+', '+e.cell.y+')':'')+' · '+e.ids.map(id=>state.settlers.find(p=>p.id===id)?.name).join(', ')+' · '+(e.arriveAt?'осталось '+Math.max(0,Math.ceil((e.arriveAt-Date.now())/60000))+' мин':'возвращение: день '+e.returnDay)+'</div>').join(''):'<small>Сейчас никто не в экспедиции.</small>';Array.from($('missions').querySelectorAll('.mission')).forEach((row,i)=>{const trip=state.expeditions[i];row.append(speedButton(()=>speedTrip(trip,true)))});$('expLog').innerHTML=state.log.length?state.log.map(t=>'<p>'+t+'</p>').join(''):'<small>Пока нет событий.</small>'}
 $('chooseWorldCell').onclick=()=>openTab('world');
 function resolveExpeditions(){let finished=state.expeditions.filter(e=>(e.arriveAt?Date.now()>=e.arriveAt:e.returnDay<=state.day));state.expeditions=state.expeditions.filter(e=>(e.arriveAt?Date.now()<e.arriveAt:e.returnDay>state.day));for(let e of finished){let m=e.cell&&e.action?fieldMission(e.cell,e.action):missions[e.type],names=e.ids.map(id=>state.settlers.find(p=>p.id===id)?.name).join(', '),skill=e.ids.reduce((n,id)=>n+state.settlers.find(p=>p.id===id).skill,0)/e.ids.length;let risk=Math.max(.04,m.risk-skill*.018),dead=0,infected=0;for(let id of e.ids){let p=state.settlers.find(p=>p.id===id);p.status='дома';let roll=Math.random();if(roll<risk*.17){p.health=0;p.status='погиб';dead++}else if(roll<risk*.57){p.health=Math.max(10,p.health-25);p.status='заражён';infected++}else if(roll<risk){p.health=Math.max(20,p.health-15)}else p.skill=Math.min(10,p.skill+1)}let survivors=e.ids.filter(id=>state.settlers.find(p=>p.id===id).health>0).length;if(survivors){let gain=(arr)=>Math.floor(arr[0]+Math.random()*(arr[1]-arr[0]+1))*survivors;let f=gain(m.food),w=gain(m.wood),met=gain(m.metal);state.food+=f;state.wood+=w;state.metal+=met;logEvent(names+' вернулись из похода. Добыча: еда '+f+', материалы '+w+', металл '+met+'.'+(infected?' Заражение: '+infected+'.':'')+(dead?' Погибли: '+dead+'.':''))}else logEvent('Экспедиция '+names+' не вернулась. Все погибли.');}}
 
@@ -140,7 +140,7 @@ function renderAgriculture(){normalizePlots();let selected=$('cropSelect').value
 $('autoFarm').textContent='Автосбор: '+(ag.auto?'вкл.':'выкл.');
 $('agriSummary').textContent='Грядок: '+ag.plots.length+' · Агроном: '+(farmer()?.name||'не назначен / занят')+' · бонус урожая: +'+farmerBonus();
 let box=$('plots');box.replaceChildren();ag.plots.forEach((p,i)=>{let d=document.createElement('div');d.className='plot';let c=CROPS.find(x=>x.name===p.crop),g=c&&growth(p,c),ready=g&&g.remaining===0;let title=document.createElement('b');title.textContent='Грядка '+(i+1)+' · '+(c?c.icon+' '+c.name:'свободна');d.append(title);
-let detail=document.createElement('small');detail.textContent=c?(ready?'Урожай созрел':(g.wet?'Растёт':'Сухо · рост остановлен')+' · осталось '+kitchenClock(g.minutes*minute)+(p.fertilized?' · ×2':'')):'Выбери культуру и посади';d.append(detail);
+let detail=document.createElement('small');detail.textContent=c?(ready?'Урожай созрел':(g.wet?'Растёт':'Сухо · рост остановлен')+' · осталось '+kitchenClock(g.minutes*minute)+(p.fertilized?' · ×2':'')):'Выбери культуру и посади';d.append(detail);if(c&&!ready)d.append(speedButton(()=>{if(ag.plots[i]!==p)return;p.remaining=0;p.since=Date.now();reconcileJobs();update()}));
 if(c){let bar=document.createElement('div');bar.className='progress';let inner=document.createElement('i');inner.style.width=Math.min(100,Math.max(0,100*g.progress))+'%';bar.append(inner);d.append(bar)}
 let b=document.createElement('button');b.textContent=!c?'🌱 Посадить':ready?'🧺 Собрать':'💧 Полить';b.onclick=()=>{if(!c)plantPlot(i);else if(ready){harvestPlot(i);update()}else if(tend(state,[i],'water'))update();else msg('Полив недоступен.')};d.append(b);
 if(c&&!ready){const fertilizer=document.createElement('button');fertilizer.textContent=p.fertilized?'Удобрено ×2':'Удобрить ×2 (−1)';fertilizer.disabled=p.fertilized||ag.fertilizer<1;fertilizer.onclick=()=>{if(tend(state,[i],'fertilize'))update()};d.append(fertilizer)}box.append(d)});
@@ -366,7 +366,7 @@ function inspectCell(x,y){
   function showInfo(){
     info.setAttribute('aria-pressed','true');commands.setAttribute('aria-pressed','false');
     body.textContent='Клетка '+(x+1)+' × '+(y+1);
-    if(buildingSite){const timer=document.createElement('b');timer.dataset.end=b.buildEnd;timer.textContent=kitchenClock(b.buildEnd-Date.now());body.append(' · Строительство ',timer)}
+    if(buildingSite){const timer=document.createElement('b');timer.dataset.end=b.buildEnd;timer.textContent=kitchenClock(b.buildEnd-Date.now());body.append(' · Строительство ',timer,speedButton(()=>{if(b.buildEnd>Date.now())b.buildEnd=Date.now();reconcileJobs();inspectCell(x,y)}))}
     else if(b){const descriptions={hq:'Управление убежищем',tower:'Защита при набеге +4',trap:'Защита при набеге +2',wall:'Защита при набеге +1',canteen:'Кухня · уровень '+ck.kitchen,farm:'4 грядки',house:'Жилое здание',scrap:'Производство материалов'};body.append(' · '+(descriptions[b.t]||title))}
   }
   function makeButton(action,radial){
@@ -417,6 +417,20 @@ function settleKitchenQueue(){
   for(const name of meals)logEvent('Готово: «'+name+'» (+1 порция).');
   if(meals.length)update();
 }
+function speedButton(run){
+ const button=document.createElement('button');button.type='button';button.textContent='Ускорить';
+ button.onclick=e=>{e.stopPropagation();button.disabled=true;run()};return button;
+}
+function speedTrip(trip,whole=false){
+ if(!state.expeditions.includes(trip))return;
+ const now=Date.now(),half=(trip.departAt+trip.arriveAt)/2;
+ const end=whole?trip.arriveAt:now<(trip.siteAt??half)?(trip.siteAt??half):now<trip.doneAt?trip.doneAt:trip.arriveAt;
+ const shift=Math.max(0,end-now);
+ for(const key of ['departAt','siteAt','doneAt','arriveAt'])if(trip[key])trip[key]-=shift;
+ if(!trip.arriveAt)trip.returnDay=state.day;
+ if(trip.arriveAt<=now||!trip.arriveAt)resolveExpeditions();
+ registerSites();update();
+}
 function kitchenClock(ms){const sec=Math.max(0,Math.ceil(ms/1000));return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
 function setDishPicker(open){
   $('dishPicker').hidden=!open;
@@ -437,7 +451,13 @@ function renderKitchenQueue(){
     const remaining=i===0?item.end-Date.now():item.end-item.start;
     time.textContent=kitchenClock(remaining);
     pair.setAttribute('aria-label',pair.title+' · '+time.textContent);
-    pair.append(dishArt(r),time);row.append(pair);
+    pair.append(dishArt(r),time,speedButton(()=>{
+      const index=ck.queue.indexOf(item);if(index<0)return;
+      const now=Date.now(),shift=Math.max(0,item.end-Math.max(item.start,now));
+      ck.queue.splice(index,1);
+      for(const next of ck.queue.slice(index)){next.start-=shift;next.end-=shift}
+      ck.queue.unshift({...item,start:now,end:now});settleKitchenQueue();renderKitchenQueue();
+    }));row.append(pair);
   });
   root.replaceChildren(heading,row);
 }
@@ -618,10 +638,10 @@ function worldCanvasDraw(){
    const key=JSON.stringify(rows);
    if(orders.dataset.orders!==key){
      orders.dataset.orders=key;
-     orders.replaceChildren(...rows.map(([crew,where,why])=>{
+     orders.replaceChildren(...rows.map(([crew,where,why],index)=>{
        const card=document.createElement('div'),name=document.createElement('b'),place=document.createElement('span'),task=document.createElement('small');
        name.textContent=crew;place.textContent=where;task.textContent=why;
-       card.append(name,place,task);return card;
+       const trip=state.expeditions[index];card.append(name,place,task,speedButton(()=>speedTrip(trip)));return card;
      }));
    }
  }
