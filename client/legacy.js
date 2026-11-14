@@ -12,7 +12,26 @@ import {Shelter,cellAt,point} from './Shelter.ts';
 import {construct} from '../server/construction.ts';
 import {constructionError} from '../shared/shelter.ts';
 
-const C=document.getElementById('game'),W=24,H=16,S=50;const defs={tower:{name:'Башня',icon:'🎯',cost:[0,35,25]},trap:{name:'Ловушка',icon:'🪤',cost:[0,15,5]},farm:{name:'Ферма',icon:'🌱',cost:[0,30,0]},scrap:{name:'Мастерская',icon:'🔧',cost:[0,25,15]},house:{name:'Жильё',icon:'🏠',cost:[20,40,0]},wall:{name:'Баррикада',icon:'🧱',cost:[0,15,0]},remove:{name:'Убрать',icon:'✖',cost:[0,0,0]}};let selected='tower',state;const initialSettlers=()=>[{id:1,name:'Анна',role:'Фельдшер',skill:2,health:100,status:'дома'},{id:2,name:'Виктор',role:'Механик',skill:3,health:100,status:'дома'},{id:3,name:'Марина',role:'Агроном',skill:2,health:100,status:'дома'},{id:4,name:'Егор',role:'Охотник',skill:7,health:100,status:'дома'},{id:5,name:'Лена',role:'Разведчица',skill:6,health:100,status:'дома'}];const seed=()=>({day:1,food:120,wood:160,metal:90,people:5,hp:100,settlers:initialSettlers(),expeditions:[],log:[],buildings:[{x:6,y:5,t:'hq'},{x:5,y:4,t:'farm'},{x:8,y:5,t:'house'},{x:7,y:7,t:'scrap'},{x:3,y:4,t:'tower'},{x:12,y:6,t:'trap'}],zombies:[],wave:0});try{state=readSave(localStorage)||seed()}catch{state=seed()}if(!Array.isArray(state.settlers)){state.settlers=initialSettlers();state.expeditions=[];state.log=[];state.people=state.settlers.length}state.expeditions ||= [];state.log ||= [];const inside=(x,y)=>x>=4&&x<=10&&y>=3&&y<=8;const occupied=(x,y)=>state.buildings.some(b=>b.x===x&&b.y===y);const $=id=>document.getElementById(id);const save=()=>{try{localStorage.setItem(saveKey,JSON.stringify(state))}catch{}};const msg=t=>$('message').textContent=t;function renderUI(){state.people=state.settlers.filter(p=>p.health>0).length;for(let k of ['food','wood','metal','people','hp'])$(k).textContent=state[k];$('day').textContent='День '+state.day;$('wave').textContent=state.wave?'Набегов: '+state.wave:'Угроза: низкая';document.querySelectorAll('.tool').forEach(el=>el.classList.toggle('active',el.dataset.t===selected))}let zoom=1,panX=0,panY=0,preview=null;
+const C=document.getElementById('game'),W=24,H=16,S=50;const defs={tower:{name:'Башня',icon:'🎯',cost:[0,35,25]},trap:{name:'Ловушка',icon:'🪤',cost:[0,15,5]},farm:{name:'Ферма',icon:'🌱',cost:[0,30,0]},scrap:{name:'Мастерская',icon:'🔧',cost:[0,25,15]},house:{name:'Жильё',icon:'🏠',cost:[20,40,0]},wall:{name:'Баррикада',icon:'🧱',cost:[0,15,0]},remove:{name:'Убрать',icon:'✖',cost:[0,0,0]}};let selected='tower',state;const initialSettlers=()=>[{id:1,name:'Анна',role:'Фельдшер',skill:2,health:100,status:'дома'},{id:2,name:'Виктор',role:'Механик',skill:3,health:100,status:'дома'},{id:3,name:'Марина',role:'Агроном',skill:2,health:100,status:'дома'},{id:4,name:'Егор',role:'Охотник',skill:7,health:100,status:'дома'},{id:5,name:'Лена',role:'Разведчица',skill:6,health:100,status:'дома'}];const seed=()=>({day:1,food:120,wood:160,metal:90,people:5,hp:100,settlers:initialSettlers(),expeditions:[],log:[],buildings:[{x:6,y:5,t:'hq'},{x:5,y:4,t:'farm'},{x:8,y:5,t:'house'},{x:7,y:7,t:'scrap'},{x:3,y:4,t:'tower'},{x:12,y:6,t:'trap'}],zombies:[],wave:0});
+const activeKey=sessionStorage.getItem('activeShelter')||'-1,1';
+const [homeX,homeY]=activeKey.split(',').map(Number);
+const origin={x:homeX,y:homeY};
+const slot=activeKey==='-1,1'?saveKey:saveKey+':'+activeKey;
+function enterShelter(key){
+ if(key===activeKey){openTab('base');return}
+ save();sessionStorage.setItem('activeShelter',key);location.reload();
+}
+function registerSites(){
+ const known=JSON.parse(localStorage.getItem(saveKey+':sites')||'{}');
+ Object.assign(known,state.world.structures);
+ for(const e of state.expeditions)if(e.kind&&e.cell&&e.doneAt<=Date.now())known[cellKey(e.cell)]=e.kind;
+ const encoded=JSON.stringify(known);
+ if(localStorage.getItem(saveKey+':sites')!==encoded)localStorage.setItem(saveKey+':sites',encoded);
+ return known;
+}
+try{state=slot===saveKey?readSave(localStorage)||seed():JSON.parse(localStorage.getItem(slot)||'null');
+ if(!state){state=seed();state.buildings=state.buildings.filter(b=>b.t==='hq')}
+}catch{state=seed()}if(!Array.isArray(state.settlers)){state.settlers=initialSettlers();state.expeditions=[];state.log=[];state.people=state.settlers.length}state.expeditions ||= [];state.log ||= [];const inside=(x,y)=>x>=4&&x<=10&&y>=3&&y<=8;const occupied=(x,y)=>state.buildings.some(b=>b.x===x&&b.y===y);const $=id=>document.getElementById(id);const save=()=>{try{localStorage.setItem(slot,JSON.stringify(state))}catch{}};const msg=t=>$('message').textContent=t;function renderUI(){state.people=state.settlers.filter(p=>p.health>0).length;for(let k of ['food','wood','metal','people','hp'])$(k).textContent=state[k];$('day').textContent='День '+state.day;$('wave').textContent=state.wave?'Набегов: '+state.wave:'Угроза: низкая';document.querySelectorAll('.tool').forEach(el=>el.classList.toggle('active',el.dataset.t===selected))}let zoom=1,panX=0,panY=0,preview=null;
 defs.canteen={name:'Столовая',icon:'🍲',cost:[0,45,15]};
 if (!state.canteenPlaced) {
   let tile;
@@ -90,7 +109,7 @@ let selectedCell=null;
 function worldMessage(title,body,choices){state.world.storyQueue.push({title,body,choices});}
 function renderWorld(){const w=state.world;const map=$('worldmap');map.innerHTML='';$('radioStatus').textContent=w.radio?'📻 Рация работает · канал выживших открыт (сеть пока не реализована)':'📻 Связь отсутствует · альянсы недоступны';const panel=$('story');panel.innerHTML='';if(w.storyQueue.length){const event=w.storyQueue[0];let h=document.createElement('strong');h.textContent=event.title;panel.append(h);let p=document.createElement('p');p.textContent=event.body;panel.append(p);event.choices.forEach((c,i)=>{let btn=document.createElement('button');btn.textContent=c.label;btn.onclick=()=>{w.storyQueue.shift();applyChoice(c);update()};panel.append(btn)})}else{panel.innerHTML='<strong>📖 Журнал истории</strong><p>'+(w.radio?'Радиоканал открыт. Другие выжившие существуют, но серверная MMO ещё не подключена.':w.chapter?'Находки складываются в картину. Радиовышка может оказаться ключом к связи.':'День первый. За оградой — тишина. Нужно исследовать окрестности и найти следы пропавших людей.')+'</p>'}}
 function applyChoice(c){const w=state.world;if(c.effect==='radio'){w.radio=true;logEvent('Восстановлена рация. Связь с другими поселениями теперь возможна.')}else if(c.effect==='food'){state.food+=15;logEvent('Найдены дополнительные консервы: +15 еды.')}else if(c.effect==='metal'){state.metal+=12;logEvent('Сохранены радиодетали: +12 металла.')}else if(c.effect==='clue'){if(!w.clues.includes('frequency'))w.clues.push('frequency');logEvent('Записана аварийная частота.')}else if(c.effect==='none')logEvent('Решение принято: '+c.label);}
-function worldDiscovery(e){if(e.cell&&e.action){finishCell(state,e.cell,e.action);if(e.kind){state.world.structures??={};state.world.structures[cellKey(e.cell)]=e.kind}return}if(e.cell){state.world.exploredCells??=[];const key=e.cell.x+','+e.cell.y;if(!state.world.exploredCells.includes(key))state.world.exploredCells.push(key);return}const w=state.world,id=e.type; if(!w.visited.includes(id))w.visited.push(id);if(id==='scout'){for(let key of ['farmstead','clinic','relay'])if(!w.discovered.includes(key))w.discovered.push(key);if(!w.storyDone.includes('scout')){w.storyDone.push('scout');w.chapter=1;worldMessage('Глава I · Следы эвакуации','На старой дороге разведчики нашли автобус с заколоченными окнами. На приборной панели — карта с отметкой радиовышки. Рядом лежит блокнот: «Не доверяйте голосам на общей частоте».',[{label:'Забрать карту и записать частоту',effect:'clue'},{label:'Забрать полезные детали',effect:'metal'}])}}
+function worldDiscovery(e){if(e.cell&&e.action){finishCell(state,e.cell,e.action);if(e.kind){state.world.structures??={};state.world.structures[cellKey(e.cell)]=e.kind;registerSites()}return}if(e.cell){state.world.exploredCells??=[];const key=e.cell.x+','+e.cell.y;if(!state.world.exploredCells.includes(key))state.world.exploredCells.push(key);return}const w=state.world,id=e.type; if(!w.visited.includes(id))w.visited.push(id);if(id==='scout'){for(let key of ['farmstead','clinic','relay'])if(!w.discovered.includes(key))w.discovered.push(key);if(!w.storyDone.includes('scout')){w.storyDone.push('scout');w.chapter=1;worldMessage('Глава I · Следы эвакуации','На старой дороге разведчики нашли автобус с заколоченными окнами. На приборной панели — карта с отметкой радиовышки. Рядом лежит блокнот: «Не доверяйте голосам на общей частоте».',[{label:'Забрать карту и записать частоту',effect:'clue'},{label:'Забрать полезные детали',effect:'metal'}])}}
 if(id==='farmstead'&&!w.storyDone.includes('farmstead')){w.storyDone.push('farmstead');worldMessage('Теплицы без хозяев','В теплице сохранились пакеты семян и банки с едой. На стене — странные царапины, будто растения пытались выбраться наружу.',[{label:'Забрать продукты (+15 еды)',effect:'food'},{label:'Зафиксировать необычные следы',effect:'none'}])}
 if(id==='city'&&!w.storyDone.includes('city')){w.storyDone.push('city');worldMessage('Город · Квартира № 17','За запертой дверью слышится стук. Внутри обнаружена работающая радиостанция, но её антенна сломана. На стене записана частота аварийной связи.',[{label:'Записать частоту',effect:'clue'},{label:'Разобрать оборудование (+12 металла)',effect:'metal'}])}
 if(id==='relay'&&!w.storyDone.includes('relay')){w.storyDone.push('relay');worldMessage('Глава II · Голоса в эфире','На вершине вышки сохранился аварийный радиоблок. В динамике треск и обрывок сообщения: «Если кто-то слышит — ответьте…» Вы можете наладить связь, но это выдаст ваше присутствие.',[{label:'Восстановить радиосвязь',effect:'radio'},{label:'Пока оставить передатчик выключенным',effect:'none'}])}
@@ -549,15 +568,16 @@ function worldCanvasDraw(){
  ellipse(8,-7,3,4,'#a3444036');
  ellipse(-8,7,3,4,'#c9a94c19');
  if(selectedCell)tile(selectedCell.x,selectedCell.y,'#ddb15aa8');
- for(const key of state.world.posts||[]){const [x,y]=key.split(',').map(Number);const [px,py]=pt(x,y);paintSprite(c,state.world.structures?.[key]||'tower',px,py,36*worldScale)}
- const homePos=pt(-.75,.75);paintSprite(c,'hq',...homePos,52*worldScale);
+ const knownSites=registerSites();
+ for(const key of new Set([...Object.keys(knownSites),...(state.world.posts||[])])){const [x,y]=key.split(',').map(Number);const [px,py]=pt(x,y);paintSprite(c,knownSites[key]||'tower',px,py+3*worldScale,24*worldScale)}
+ const homePos=pt(-1,1);paintSprite(c,'hq',homePos[0],homePos[1]+3*worldScale,28*worldScale);
  // Real-time expedition markers move along the route, including after page reload.
  for(const expedition of state.expeditions){
   if(!expedition.departAt||!expedition.arriveAt)continue;
   const destination=Object.values(sites).find(site=>site.type===expedition.type);
   if(!destination&&!expedition.cell)continue;
   const progress=Math.max(0,Math.min(1,(Date.now()-expedition.departAt)/(expedition.arriveAt-expedition.departAt)));
-  const h=pt((sites.home.x-50)/4,(sites.home.y-50)/4),d=expedition.cell?pt(expedition.cell.x,expedition.cell.y):pt((destination.x-50)/4,(destination.y-50)/4);
+  const h=pt(expedition.origin?.x??-1,expedition.origin?.y??1),d=expedition.cell?pt(expedition.cell.x,expedition.cell.y):pt((destination.x-50)/4,(destination.y-50)/4);
   const now=Date.now(),work=expedition.siteAt&&now>=expedition.siteAt&&now<expedition.doneAt;
   let travel=progress<.5?progress*2:2-progress*2;
   let deadline=progress<.5?(expedition.departAt+expedition.arriveAt)/2:expedition.arriveAt,label=progress<.5?'В пути':'Домой';
@@ -572,8 +592,8 @@ function worldCanvasDraw(){
     travel=Math.min(1,Math.max(0,(now-expedition.departAt)/(expedition.siteAt-expedition.departAt)),Math.max(0,(expedition.arriveAt-now)/(expedition.arriveAt-expedition.doneAt)));
     deadline=now<expedition.siteAt?expedition.siteAt:work?expedition.doneAt:expedition.arriveAt;
     label=now<expedition.siteAt?'В пути':work?'Стройка':'Домой';
-    paintSprite(c,now>=expedition.doneAt?expedition.kind:'site',...d,38*worldScale);
-    if(now<expedition.doneAt){c.save();c.globalAlpha=.58;paintSprite(c,expedition.kind,d[0],d[1]-12*worldScale,32*worldScale);c.restore()}
+    paintSprite(c,now>=expedition.doneAt?expedition.kind:'site',d[0],d[1]+3*worldScale,24*worldScale);
+    if(now<expedition.doneAt){c.save();c.globalAlpha=.58;paintSprite(c,expedition.kind,d[0],d[1]+3*worldScale,24*worldScale);c.restore()}
   }
   const px=h[0]+(d[0]-h[0])*travel,py=h[1]+(d[1]-h[1])*travel;
   c.save();c.translate(...target);
@@ -581,7 +601,7 @@ function worldCanvasDraw(){
   c.beginPath();c.moveTo(-arm,-arm*.55);c.lineTo(arm,arm*.55);c.moveTo(-arm,arm*.55);c.lineTo(arm,-arm*.55);
   c.lineCap='round';c.strokeStyle='#29221c';c.lineWidth=5;c.stroke();c.strokeStyle='#ffc779';c.lineWidth=2.5;c.stroke();c.restore();
   c.save();c.translate(px,py);if((d[0]<h[0])!==returning)c.scale(-1,1);
-  paintSprite(c,'traveler',0,0,Math.max(21,30*worldScale));c.restore();
+  paintSprite(c,'traveler',0,0,Math.max(7,10*worldScale));c.restore();
   c.textAlign='center';const badge=label+' '+kitchenClock(deadline-now);c.font='bold 12px system-ui';const bw=c.measureText(badge).width+8;c.fillStyle='#201f1b';c.fillRect(px-bw/2,py+10,bw,18);c.fillStyle='#ffdfa1';c.fillText(badge,px,py+23);
  }
  const orders=el.querySelector('.worldOrders');
@@ -681,6 +701,7 @@ worldMapEl.addEventListener('pointerup',e=>{
  const dy=(pos.y-worldMapEl.clientHeight*.40-worldPan.y)/(11*worldScale);
  const x=Math.round((dx+dy)/2),y=Math.round((dy-dx)/2);
  if(Math.abs(x)>24||Math.abs(y)>24)return;
+ const key=cellKey({x,y});if(key==='-1,1'||registerSites()[key]==='house'){enterShelter(key);return}
  selectedCell={x,y};
  renderWorld();
 });
@@ -693,9 +714,9 @@ function cellDescription(cell){
 function openFieldOrder(cell,action){
  const dlg=$('fieldOrder'),party=$('fieldParty');
  $('fieldTitle').textContent=fieldActions[action]+' · '+region(cell).name;
- $('fieldDetails').textContent=cellDescription(cell)+' · '+fieldDuration(cell,action)+' мин · 3 пайка на человека. '+({scout:'Отметить клетку как разведанную.',research:'Исследовать местность и собрать материалы.',build:'Возвести полевой пост за 20 материалов и 5 металла.'}[action]);
+ $('fieldDetails').textContent=cellDescription(cell)+' · '+fieldDuration(cell,action,origin)+' мин · 3 пайка на человека. '+({scout:'Отметить клетку как разведанную.',research:'Исследовать местность и собрать материалы.',build:'Возвести полевой пост за 20 материалов и 5 металла.'}[action]);
  const select=$('fieldKind');select.hidden=action!=='build';select.value='';party.hidden=action==='build';$('fieldSend').disabled=action==='build';
- select.onchange=()=>{party.hidden=!select.value;$('fieldSend').disabled=!select.value;$('fieldDetails').textContent=cellDescription(cell)+' · путь '+Math.max(1,fieldDuration(cell,'build')-10)+' мин в одну сторону · стройка '+(select.value==='house'?30:10)+' мин · 20 материалов и 5 металла'};
+ select.onchange=()=>{party.hidden=!select.value;$('fieldSend').disabled=!select.value;$('fieldDetails').textContent=cellDescription(cell)+' · путь '+Math.max(1,fieldDuration(cell,'build',origin)-10)+' мин в одну сторону · стройка '+(select.value==='house'?30:10)+' мин · 20 материалов и 5 металла'};
  party.replaceChildren();$('fieldError').textContent='';
  for(const p of state.settlers){
    const label=document.createElement('label'),box=document.createElement('input');
@@ -704,7 +725,8 @@ function openFieldOrder(cell,action){
  }
  $('fieldSend').onclick=()=>{
    const ids=[...party.querySelectorAll(':checked')].map(el=>Number(el.value));
-   const error=dispatch(state,cell,action,ids,Date.now(),select.value||'tower');if(error){$('fieldError').textContent=error;return}
+   if(action==='build'&&registerSites()[cellKey(cell)]){ $('fieldError').textContent='Клетка занята';return }
+   const error=dispatch(state,cell,action,ids,Date.now(),select.value||'tower',origin);if(error){$('fieldError').textContent=error;return}
    logEvent(fieldActions[action]+' · '+cellKey(cell));selectedCell=null;dlg.close();update();
  };
  dlg.showModal();
