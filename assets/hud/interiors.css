@@ -40,3 +40,5 @@ body {background:#161616}
 #agriculture .plot .progress {background:#171619}#agriculture .plot .progress i {background:#ad905e}
 #kitchenScreen select option,.wrap select option {background:#292724;color:#f0e9dc}
 @media(max-width:520px){#agriculture #plots,#nutrition .peoplegrid{padding:5px}.wrap>section:is(#world,#agriculture,#nutrition,.expeditions){padding:8px}}
+
+#world .worldmap .mapnode{min-width:0;width:25px;height:25px;padding:0;font-size:0;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none}#world .worldmap .mapnode b{font-size:14px}#world .worldmap .mapnode small{display:none}
