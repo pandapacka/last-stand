@@ -25,6 +25,7 @@ function completed(b){return !b.buildEnd || b.buildEnd<=Date.now()}
 
 const sprites={};
 const art = {
+  traveler:'base/expedition-scout',
   site:'construction/site', hammer:'construction/hammer', saw:'construction/saw', clock:'construction/clock', canteen:'base/canteen', hq:'base/hq', tower:'base/watchtower', trap:'base/barricade',
   farm:'base/garden', scrap:'base/workshop', house:'base/barracks', wall:'base/fence',
   spruce:'nature/spruce', pine:'nature/pine', warehouse:'base/warehouse', grass:'nature/grass'
@@ -560,6 +561,13 @@ function worldCanvasDraw(){
   const now=Date.now(),work=expedition.siteAt&&now>=expedition.siteAt&&now<expedition.doneAt;
   let travel=progress<.5?progress*2:2-progress*2;
   let deadline=progress<.5?(expedition.departAt+expedition.arriveAt)/2:expedition.arriveAt,label=progress<.5?'В пути':'Домой';
+  const returning=expedition.doneAt?now>=expedition.doneAt:progress>=.5;
+  const target=returning?h:d;
+  c.save();
+  c.beginPath();c.moveTo(...h);c.lineTo(...d);
+  c.setLineDash([6*worldScale,4*worldScale]);c.lineCap='round';
+  c.strokeStyle='#28241f';c.lineWidth=3.8;c.stroke();
+  c.strokeStyle='#e1c58b';c.lineWidth=1.8;c.stroke();c.restore();
   if(expedition.siteAt){
     travel=Math.min(1,Math.max(0,(now-expedition.departAt)/(expedition.siteAt-expedition.departAt)),Math.max(0,(expedition.arriveAt-now)/(expedition.arriveAt-expedition.doneAt)));
     deadline=now<expedition.siteAt?expedition.siteAt:work?expedition.doneAt:expedition.arriveAt;
@@ -567,9 +575,14 @@ function worldCanvasDraw(){
     paintSprite(c,now>=expedition.doneAt?expedition.kind:'site',...d,38*worldScale);
     if(now<expedition.doneAt){c.save();c.globalAlpha=.58;paintSprite(c,expedition.kind,d[0],d[1]-12*worldScale,32*worldScale);c.restore()}
   }
-  const px=h[0]+(d[0]-h[0])*travel,py=h[1]+(d[1]-h[1])*travel-12*worldScale*Math.sin(travel*Math.PI);
-  c.beginPath();c.arc(px,py,10*worldScale,0,Math.PI*2);c.fillStyle='#f0d68c';c.fill();c.strokeStyle='#24382c';c.lineWidth=2;c.stroke();
-  c.font=(12*worldScale)+'px sans-serif';c.textAlign='center';c.fillStyle='#26382b';c.fillText('➤',px,py+4*worldScale);const badge=label+' '+kitchenClock(deadline-now);c.font='bold 12px system-ui';const bw=c.measureText(badge).width+8;c.fillStyle='#201f1b';c.fillRect(px-bw/2,py+10,bw,18);c.fillStyle='#ffdfa1';c.fillText(badge,px,py+23);
+  const px=h[0]+(d[0]-h[0])*travel,py=h[1]+(d[1]-h[1])*travel;
+  c.save();c.translate(...target);
+  const arm=Math.min(12,Math.max(4,6*worldScale));
+  c.beginPath();c.moveTo(-arm,-arm*.55);c.lineTo(arm,arm*.55);c.moveTo(-arm,arm*.55);c.lineTo(arm,-arm*.55);
+  c.lineCap='round';c.strokeStyle='#29221c';c.lineWidth=5;c.stroke();c.strokeStyle='#ffc779';c.lineWidth=2.5;c.stroke();c.restore();
+  c.save();c.translate(px,py);if((d[0]<h[0])!==returning)c.scale(-1,1);
+  paintSprite(c,'traveler',0,0,Math.max(21,30*worldScale));c.restore();
+  c.textAlign='center';const badge=label+' '+kitchenClock(deadline-now);c.font='bold 12px system-ui';const bw=c.measureText(badge).width+8;c.fillStyle='#201f1b';c.fillRect(px-bw/2,py+10,bw,18);c.fillStyle='#ffdfa1';c.fillText(badge,px,py+23);
  }
  const orders=el.querySelector('.worldOrders');
  if(orders){
