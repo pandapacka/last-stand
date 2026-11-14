@@ -1,3 +1,5 @@
+import {actions as fieldActions,cellKey,duration as fieldDuration,region} from '../shared/world.ts';
+import {dispatch,finishCell,fieldMission} from '../server/world.ts';
 import {CROPS} from '../shared/crops.ts';
 import {growth,plant,tend,harvest} from '../server/farm.ts';
 import {settleSettlers,mealSatiety} from '../server/settlers.ts';
@@ -63,9 +65,9 @@ function inspectTap(e){const pos=worldPointerPosition(e);const b=scene.pick(pos.
 C.addEventListener('pointerup',e=>{if(!gestureMoved&&pointers.size===1){let p=hit(e);if(window.mapMode==='view')inspectTap(e,p);else if(p.x>=0&&p.x<W&&p.y>=0&&p.y<H){if(selected==='remove')place(p.x,p.y);else{preview={...p,t:selected,rot:preview?.rot||0};syncPreview()}}}pointers.delete(e.pointerId);if(pointers.size<2)gesture=null;downAt=null});
 C.addEventListener('pointercancel',e=>{pointers.delete(e.pointerId);gesture=null;gestureMoved=true});const missions={sector:{label:'Разведка клетки',days:1,risk:.12,food:[0,10],wood:[2,10],metal:[0,4]},forest:{label:'Охота в лесу',days:1,risk:.12,food:[18,40],wood:[0,8],metal:[0,0]},scout:{label:'Разведка окрестностей',days:1,risk:.19,food:[0,12],wood:[5,18],metal:[0,5]},city:{label:'Поиск припасов в городе',days:2,risk:.42,food:[15,45],wood:[5,20],metal:[10,35]},farmstead:{label:'Заброшенная ферма',days:2,risk:.24,food:[15,30],wood:[8,24],metal:[0,8]},clinic:{label:'Медпункт',days:2,risk:.5,food:[0,8],wood:[0,4],metal:[8,20]},relay:{label:'Радиовышка',days:3,risk:.54,food:[0,8],wood:[0,10],metal:[10,24]}};
 function logEvent(text){state.log.unshift(text);state.log=state.log.slice(0,15)}
-function renderExpeditions(){let box=$('settlers');box.innerHTML='';for(let p of state.settlers){let l=document.createElement('label');l.className='settler'+(p.status!=='дома'?' busy':'');let cb=document.createElement('input');cb.type='checkbox';cb.value=p.id;cb.disabled=p.status!=='дома'||p.health<=0;l.append(cb);l.append(document.createTextNode(' '+p.name));let sub=document.createElement('small');sub.textContent=p.role+' · опыт '+p.skill+' · здоровье '+p.health+' · '+p.status;l.append(sub);box.append(l)}$('missions').innerHTML=state.expeditions.length?state.expeditions.map(e=>'<div class="mission">'+missions[e.type].label+(e.cell?' ('+e.cell.x+', '+e.cell.y+')':'')+' · '+e.ids.map(id=>state.settlers.find(p=>p.id===id)?.name).join(', ')+' · '+(e.arriveAt?'осталось '+Math.max(0,Math.ceil((e.arriveAt-Date.now())/60000))+' мин':'возвращение: день '+e.returnDay)+'</div>').join(''):'<small>Сейчас никто не в экспедиции.</small>';$('expLog').innerHTML=state.log.length?state.log.map(t=>'<p>'+t+'</p>').join(''):'<small>Пока нет событий.</small>'}
-$('send').onclick=()=>{let ids=[...document.querySelectorAll('#settlers input:checked')].map(x=>+x.value);if(ids.length<1||ids.length>2){msg('Выбери одного или двух свободных поселенцев.');return}let type=$('destination').value,m=missions[type];if(state.food<ids.length*3){msg('Для экспедиции нужно '+ids.length*3+' еды.');return}if(type==='sector'&&!routeCell)return msg('Выбери клетку карты.');state.food-=ids.length*3;for(let id of ids)state.settlers.find(p=>p.id===id).status='в экспедиции';state.expeditions.push({type,ids,...(type==='sector'?{cell:{...routeCell}}:{}),returnDay:state.day+m.days,departAt:Date.now(),arriveAt:Date.now()+(type==='sector'?sectorMinutes(routeCell):{forest:8,scout:6,city:25,farmstead:15,clinic:30,relay:35}[type]||12)*60000});logEvent('Отряд отправлен: '+m.label+'.');msg('Отряд отправлен. Возвращение по таймеру реального времени.');update()};
-function resolveExpeditions(){let finished=state.expeditions.filter(e=>(e.arriveAt?Date.now()>=e.arriveAt:e.returnDay<=state.day));state.expeditions=state.expeditions.filter(e=>(e.arriveAt?Date.now()<e.arriveAt:e.returnDay>state.day));for(let e of finished){let m=missions[e.type],names=e.ids.map(id=>state.settlers.find(p=>p.id===id)?.name).join(', '),skill=e.ids.reduce((n,id)=>n+state.settlers.find(p=>p.id===id).skill,0)/e.ids.length;let risk=Math.max(.04,m.risk-skill*.018),dead=0,infected=0;for(let id of e.ids){let p=state.settlers.find(p=>p.id===id);p.status='дома';let roll=Math.random();if(roll<risk*.17){p.health=0;p.status='погиб';dead++}else if(roll<risk*.57){p.health=Math.max(10,p.health-25);p.status='заражён';infected++}else if(roll<risk){p.health=Math.max(20,p.health-15)}else p.skill=Math.min(10,p.skill+1)}let survivors=e.ids.filter(id=>state.settlers.find(p=>p.id===id).health>0).length;if(survivors){let gain=(arr)=>Math.floor(arr[0]+Math.random()*(arr[1]-arr[0]+1))*survivors;let f=gain(m.food),w=gain(m.wood),met=gain(m.metal);state.food+=f;state.wood+=w;state.metal+=met;logEvent(names+' вернулись из похода. Добыча: еда '+f+', материалы '+w+', металл '+met+'.'+(infected?' Заражение: '+infected+'.':'')+(dead?' Погибли: '+dead+'.':''))}else logEvent('Экспедиция '+names+' не вернулась. Все погибли.');}}
+function renderExpeditions(){$('missions').innerHTML=state.expeditions.length?state.expeditions.map(e=>'<div class="mission">'+(fieldActions[e.action]||missions[e.type].label)+(e.cell?' ('+e.cell.x+', '+e.cell.y+')':'')+' · '+e.ids.map(id=>state.settlers.find(p=>p.id===id)?.name).join(', ')+' · '+(e.arriveAt?'осталось '+Math.max(0,Math.ceil((e.arriveAt-Date.now())/60000))+' мин':'возвращение: день '+e.returnDay)+'</div>').join(''):'<small>Сейчас никто не в экспедиции.</small>';$('expLog').innerHTML=state.log.length?state.log.map(t=>'<p>'+t+'</p>').join(''):'<small>Пока нет событий.</small>'}
+$('chooseWorldCell').onclick=()=>openTab('world');
+function resolveExpeditions(){let finished=state.expeditions.filter(e=>(e.arriveAt?Date.now()>=e.arriveAt:e.returnDay<=state.day));state.expeditions=state.expeditions.filter(e=>(e.arriveAt?Date.now()<e.arriveAt:e.returnDay>state.day));for(let e of finished){let m=e.cell&&e.action?fieldMission(e.cell,e.action):missions[e.type],names=e.ids.map(id=>state.settlers.find(p=>p.id===id)?.name).join(', '),skill=e.ids.reduce((n,id)=>n+state.settlers.find(p=>p.id===id).skill,0)/e.ids.length;let risk=Math.max(.04,m.risk-skill*.018),dead=0,infected=0;for(let id of e.ids){let p=state.settlers.find(p=>p.id===id);p.status='дома';let roll=Math.random();if(roll<risk*.17){p.health=0;p.status='погиб';dead++}else if(roll<risk*.57){p.health=Math.max(10,p.health-25);p.status='заражён';infected++}else if(roll<risk){p.health=Math.max(20,p.health-15)}else p.skill=Math.min(10,p.skill+1)}let survivors=e.ids.filter(id=>state.settlers.find(p=>p.id===id).health>0).length;if(survivors){let gain=(arr)=>Math.floor(arr[0]+Math.random()*(arr[1]-arr[0]+1))*survivors;let f=gain(m.food),w=gain(m.wood),met=gain(m.metal);state.food+=f;state.wood+=w;state.metal+=met;logEvent(names+' вернулись из похода. Добыча: еда '+f+', материалы '+w+', металл '+met+'.'+(infected?' Заражение: '+infected+'.':'')+(dead?' Погибли: '+dead+'.':''))}else logEvent('Экспедиция '+names+' не вернулась. Все погибли.');}}
 
 const oldUpdate=update;update=function(){oldUpdate();renderExpeditions()};
 $('attack').onclick=()=>{state.wave++;let towers=state.buildings.filter(b=>b.t==='tower'&&completed(b)).length,traps=state.buildings.filter(b=>b.t==='trap'&&completed(b)).length,walls=state.buildings.filter(b=>b.t==='wall'&&completed(b)).length;let enemy=4+state.wave*3,def=towers*4+traps*2+walls;let dmg=Math.max(0,(enemy-def)*6);state.hp=Math.max(0,state.hp-dmg);state.zombies=Array.from({length:Math.min(enemy,12)},(_,i)=>({x:i%2?1:14,y:1+(i*3)%10}));msg(dmg?'Набег! Защита уничтожила часть орды. База потеряла '+dmg+' прочности.':'Набег отбит без потерь!');update();if(state.hp===0)msg('База разрушена. Нажми «Сброс», чтобы начать заново.')};$('reset').onclick=()=>{if(confirm('Начать новую игру?')){state=seed();msg('Новая база готова.');update()}};update();$('zin').onclick=()=>{zoom=Math.min(2.6,zoom+.2);draw()};$('zout').onclick=()=>{zoom=Math.max(.65,zoom-.2);draw()};
@@ -73,18 +75,18 @@ $('attack').onclick=()=>{state.wave++;let towers=state.buildings.filter(b=>b.t==
 // World map and narrative extension 0.5. Separate save slot preserves 0.4.
 const sites={home:{name:'Убежище «Север»',icon:'🏠',x:47,y:53,desc:'Наш дом. Пока только здесь можно чувствовать себя относительно спокойно.',risk:'Безопасно'},forest:{name:'Сосновый лес',icon:'🌲',x:19,y:28,desc:'Звериные тропы, ягоды, ручей. Иногда встречаются одиночные заражённые.',risk:'Низкий',type:'forest'},scout:{name:'Старая дорога',icon:'🔭',x:68,y:30,desc:'Разбитые машины и следы эвакуации. Здесь можно узнать, куда ушли люди.',risk:'Средний',type:'scout'},farmstead:{name:'Заброшенная ферма',icon:'🚜',x:22,y:76,desc:'Теплицы и зернохранилище. Возможно, уцелели семена и консервы.',risk:'Средний',type:'farmstead'},city:{name:'Окраина города',icon:'🏚️',x:80,y:66,desc:'Магазины, гаражи, квартиры. Много припасов, но и заражённых.',risk:'Высокий',type:'city'},clinic:{name:'Медпункт',icon:'🏥',x:83,y:17,desc:'Аптечные запасы, записи врача. Сюда стоит идти только подготовленной группой.',risk:'Очень высокий',type:'clinic'},relay:{name:'Радиовышка',icon:'📡',x:51,y:9,desc:'На старой вышке может работать аварийный ретранслятор. Ключ к связи с другими выжившими.',risk:'Очень высокий',type:'relay'}};
 state.world ||= {discovered:['home','forest','scout','city'],visited:[],clues:[],radio:false,chapter:0,storyQueue:[],storyDone:[]};
-let activeSite='forest',selectedCell=null,routeCell=null;
-function sectorMinutes(cell){return 2+Math.ceil(Math.hypot(cell.x-(sites.home.x-50)/4,cell.y-(sites.home.y-50)/4))}
+let selectedCell=null;
+
 function worldMessage(title,body,choices){state.world.storyQueue.push({title,body,choices});}
-function renderWorld(){const w=state.world;const map=$('worldmap');map.innerHTML='';for(const [id,s] of Object.entries(sites)){const known=w.discovered.includes(id);const b=document.createElement('button');b.className='mapnode'+(activeSite===id?' active':'')+(!known?' locked':'');b.style.left=s.x+'%';b.style.top=s.y+'%';b.innerHTML='<b>'+(known?s.icon:'❔')+'</b>'+(known?s.name:'Неизвестно')+'<small>'+(known?(w.visited.includes(id)?'Исследовано':s.risk):'Не разведано')+'</small>';b.onclick=()=>{selectedCell=null;activeSite=id;renderWorld()};map.append(b)}const s=sites[activeSite],known=w.discovered.includes(activeSite);$('siteinfo').innerHTML='<strong>'+(known?s.icon+' '+s.name:'❔ Неизвестная точка')+'</strong><p>'+(known?s.desc:'Сначала исследуй окрестности, чтобы открыть эту точку.')+'</p><small>Опасность: '+(known?s.risk:'неизвестна')+'</small>';$('goWorld').disabled=!known||!s.type;$('radioStatus').textContent=w.radio?'📻 Рация работает · канал выживших открыт (сеть пока не реализована)':'📻 Связь отсутствует · альянсы недоступны';const panel=$('story');panel.innerHTML='';if(w.storyQueue.length){const event=w.storyQueue[0];let h=document.createElement('strong');h.textContent=event.title;panel.append(h);let p=document.createElement('p');p.textContent=event.body;panel.append(p);event.choices.forEach((c,i)=>{let btn=document.createElement('button');btn.textContent=c.label;btn.onclick=()=>{w.storyQueue.shift();applyChoice(c);update()};panel.append(btn)})}else{panel.innerHTML='<strong>📖 Журнал истории</strong><p>'+(w.radio?'Радиоканал открыт. Другие выжившие существуют, но серверная MMO ещё не подключена.':w.chapter?'Находки складываются в картину. Радиовышка может оказаться ключом к связи.':'День первый. За оградой — тишина. Нужно исследовать окрестности и найти следы пропавших людей.')+'</p>'}}
+function renderWorld(){const w=state.world;const map=$('worldmap');map.innerHTML='';$('radioStatus').textContent=w.radio?'📻 Рация работает · канал выживших открыт (сеть пока не реализована)':'📻 Связь отсутствует · альянсы недоступны';const panel=$('story');panel.innerHTML='';if(w.storyQueue.length){const event=w.storyQueue[0];let h=document.createElement('strong');h.textContent=event.title;panel.append(h);let p=document.createElement('p');p.textContent=event.body;panel.append(p);event.choices.forEach((c,i)=>{let btn=document.createElement('button');btn.textContent=c.label;btn.onclick=()=>{w.storyQueue.shift();applyChoice(c);update()};panel.append(btn)})}else{panel.innerHTML='<strong>📖 Журнал истории</strong><p>'+(w.radio?'Радиоканал открыт. Другие выжившие существуют, но серверная MMO ещё не подключена.':w.chapter?'Находки складываются в картину. Радиовышка может оказаться ключом к связи.':'День первый. За оградой — тишина. Нужно исследовать окрестности и найти следы пропавших людей.')+'</p>'}}
 function applyChoice(c){const w=state.world;if(c.effect==='radio'){w.radio=true;logEvent('Восстановлена рация. Связь с другими поселениями теперь возможна.')}else if(c.effect==='food'){state.food+=15;logEvent('Найдены дополнительные консервы: +15 еды.')}else if(c.effect==='metal'){state.metal+=12;logEvent('Сохранены радиодетали: +12 металла.')}else if(c.effect==='clue'){if(!w.clues.includes('frequency'))w.clues.push('frequency');logEvent('Записана аварийная частота.')}else if(c.effect==='none')logEvent('Решение принято: '+c.label);}
-function worldDiscovery(e){if(e.cell){state.world.exploredCells??=[];const key=e.cell.x+','+e.cell.y;if(!state.world.exploredCells.includes(key))state.world.exploredCells.push(key);return}const w=state.world,id=e.type; if(!w.visited.includes(id))w.visited.push(id);if(id==='scout'){for(let key of ['farmstead','clinic','relay'])if(!w.discovered.includes(key))w.discovered.push(key);if(!w.storyDone.includes('scout')){w.storyDone.push('scout');w.chapter=1;worldMessage('Глава I · Следы эвакуации','На старой дороге разведчики нашли автобус с заколоченными окнами. На приборной панели — карта с отметкой радиовышки. Рядом лежит блокнот: «Не доверяйте голосам на общей частоте».',[{label:'Забрать карту и записать частоту',effect:'clue'},{label:'Забрать полезные детали',effect:'metal'}])}}
+function worldDiscovery(e){if(e.cell&&e.action){finishCell(state,e.cell,e.action);return}if(e.cell){state.world.exploredCells??=[];const key=e.cell.x+','+e.cell.y;if(!state.world.exploredCells.includes(key))state.world.exploredCells.push(key);return}const w=state.world,id=e.type; if(!w.visited.includes(id))w.visited.push(id);if(id==='scout'){for(let key of ['farmstead','clinic','relay'])if(!w.discovered.includes(key))w.discovered.push(key);if(!w.storyDone.includes('scout')){w.storyDone.push('scout');w.chapter=1;worldMessage('Глава I · Следы эвакуации','На старой дороге разведчики нашли автобус с заколоченными окнами. На приборной панели — карта с отметкой радиовышки. Рядом лежит блокнот: «Не доверяйте голосам на общей частоте».',[{label:'Забрать карту и записать частоту',effect:'clue'},{label:'Забрать полезные детали',effect:'metal'}])}}
 if(id==='farmstead'&&!w.storyDone.includes('farmstead')){w.storyDone.push('farmstead');worldMessage('Теплицы без хозяев','В теплице сохранились пакеты семян и банки с едой. На стене — странные царапины, будто растения пытались выбраться наружу.',[{label:'Забрать продукты (+15 еды)',effect:'food'},{label:'Зафиксировать необычные следы',effect:'none'}])}
 if(id==='city'&&!w.storyDone.includes('city')){w.storyDone.push('city');worldMessage('Город · Квартира № 17','За запертой дверью слышится стук. Внутри обнаружена работающая радиостанция, но её антенна сломана. На стене записана частота аварийной связи.',[{label:'Записать частоту',effect:'clue'},{label:'Разобрать оборудование (+12 металла)',effect:'metal'}])}
 if(id==='relay'&&!w.storyDone.includes('relay')){w.storyDone.push('relay');worldMessage('Глава II · Голоса в эфире','На вершине вышки сохранился аварийный радиоблок. В динамике треск и обрывок сообщения: «Если кто-то слышит — ответьте…» Вы можете наладить связь, но это выдаст ваше присутствие.',[{label:'Восстановить радиосвязь',effect:'radio'},{label:'Пока оставить передатчик выключенным',effect:'none'}])}
 if(id==='clinic'&&!w.storyDone.includes('clinic')){w.storyDone.push('clinic');worldMessage('Медпункт · Протокол 09','В журнале дежурного врача описаны пациенты, реагирующие на неизвестные споры. Возможно, зомби — не единственная опасность.',[{label:'Сохранить медицинские записи',effect:'none'}])}
 }
-$('goWorld').onclick=()=>{const s=sites[activeSite];if(!s.type)return;$('destination').value=s.type;document.querySelector('.expeditions').scrollIntoView({behavior:'smooth',block:'start'});msg('Выбрано место: '+s.name+'. Теперь назначь участников экспедиции.')};
+
 // Wrap existing expedition resolution to trigger narrative only for parties that return.
 const baseResolveExpeditions=resolveExpeditions;
 resolveExpeditions=function(){const due=state.expeditions.filter(e=>(e.arriveAt?Date.now()>=e.arriveAt:e.returnDay<=state.day)).map(e=>({...e}));baseResolveExpeditions();for(const e of due){if(e.ids.some(id=>state.settlers.find(p=>p.id===id)?.health>0))worldDiscovery(e)}};
@@ -511,7 +513,7 @@ function worldCanvasDraw(){
  for(let y=-24;y<25;y++)for(let x=-24;x<25;x++){
   const h=worldHash(x,y),r=worldHash(x+90,y+90);
   const road=Math.abs(x-y+3)<1.3||Math.abs(x+8)<1&&y>0&&y<14;
-  const urban=x>4&&y>-5&&y<7;
+  const urban=region({x,y}).name==='Руины';
   const farm=x< -5&&y>2&&y<12;
   const color=road?'#817a60':urban?(h>.5?'#565f4b':'#4e5b48'):farm?'#626746':h>.72?'#36573d':h>.38?'#3c5e43':'#476a48';
   tile(x,y,color);
@@ -536,16 +538,8 @@ function worldCanvasDraw(){
  ellipse(7,4,4.5,6,'#aa43302b');
  ellipse(8,-7,3,4,'#a3444036');
  ellipse(-8,7,3,4,'#c9a94c19');
- const home=sites.home,selected=sites[activeSite];
- if(selectedCell||(selected&&activeSite!=='home'&&state.world.discovered.includes(activeSite))){
-  const from=pt((home.x-50)/4,(home.y-50)/4),to=selectedCell?pt(selectedCell.x,selectedCell.y):pt((selected.x-50)/4,(selected.y-50)/4);
-  if(selectedCell)tile(selectedCell.x,selectedCell.y,'#ddb15aa8');
-  const mid=[(from[0]+to[0])/2,(from[1]+to[1])/2-17*worldScale];
-  c.beginPath();c.moveTo(...from);c.quadraticCurveTo(...mid,...to);
-  c.setLineDash([8*worldScale,5*worldScale]);c.strokeStyle='#f3d58e';c.lineWidth=3*worldScale;c.stroke();c.setLineDash([]);
-  c.beginPath();c.arc(to[0],to[1],8*worldScale,0,Math.PI*2);c.strokeStyle='#f8d27d';c.lineWidth=2;c.stroke();
- }
-
+ if(selectedCell)tile(selectedCell.x,selectedCell.y,'#ddb15aa8');
+ for(const key of state.world.posts||[]){const [x,y]=key.split(',').map(Number);const [px,py]=pt(x,y);paintSprite(c,'tower',px,py,25*worldScale)}
  // Real-time expedition markers move along the route, including after page reload.
  for(const expedition of state.expeditions){
   if(!expedition.departAt||!expedition.arriveAt)continue;
@@ -558,26 +552,26 @@ function worldCanvasDraw(){
   c.beginPath();c.arc(px,py,10*worldScale,0,Math.PI*2);c.fillStyle='#f0d68c';c.fill();c.strokeStyle='#24382c';c.lineWidth=2;c.stroke();
   c.font=(12*worldScale)+'px sans-serif';c.textAlign='center';c.fillStyle='#26382b';c.fillText('➤',px,py+4*worldScale);
  }
- // Landmark nodes use the same projected plane as the terrain.
- for(const [id,site] of Object.entries(sites)){
-  const node=el.querySelector('[data-site="'+id+'"]');if(!node)continue;
-  const x=(site.x-50)/4,y=(site.y-50)/4;
-  const [px,py]=pt(x,y);
-  node.style.left=px+'px';node.style.top=py+'px';
-  node.style.display=(px< -65||px>width+65||py< -80||py>height+80)?'none':'';
+ const wheel=el.querySelector('.cellWheel');
+ if(wheel&&selectedCell){
+   const [x,y]=pt(selectedCell.x,selectedCell.y);
+   wheel.style.left=Math.max(90,Math.min(width-90,x))+'px';wheel.style.top=Math.max(72,Math.min(height-30,y))+'px';
  }
 }
 renderWorld=function(){
  worldRenderBefore13();
+ const map=$('worldmap');
+ $('siteinfo').textContent=selectedCell?cellDescription(selectedCell):'Выберите клетку карты';
  if(selectedCell){
-   const {x,y}=selectedCell;
-   $('siteinfo').textContent='Клетка ('+x+', '+y+') · '+(state.world.exploredCells?.includes(x+','+y)?'Исследована':'Не исследована')+' · поход '+sectorMinutes(selectedCell)+' мин';
-   $('goWorld').disabled=false;
+   const wheel=document.createElement('div');wheel.className='cellWheel';
+   for(const [action,label] of Object.entries(fieldActions)){
+     const button=document.createElement('button');button.type='button';button.textContent=label;
+     button.onclick=()=>openFieldOrder(selectedCell,action);wheel.append(button);
+   }
+   map.append(wheel);
  }
- $('goWorld').textContent='Выбрать отряд';
- const map=document.getElementById('worldmap');
  const canvas=document.createElement('canvas');canvas.setAttribute('aria-hidden','true');map.prepend(canvas);
- const hud=document.createElement('div');hud.className='worldhud';hud.textContent='🌍 Окрестности · '+(selectedCell?'Клетка '+selectedCell.x+', '+selectedCell.y:sites[activeSite]?.name||'Исследование');map.append(hud);
+ const hud=document.createElement('div');hud.className='worldhud';hud.textContent='🌍 Окрестности · '+(selectedCell?'Клетка '+selectedCell.x+', '+selectedCell.y:'Карта мира');map.append(hud);
  const controls=document.createElement('div');controls.className='worldcontrols';
  for(const [label,delta] of [['+',.2],['−',-.2]]){
   const button=document.createElement('button');button.textContent=label;button.title=delta>0?'Приблизить':'Отдалить';
@@ -585,8 +579,8 @@ renderWorld=function(){
   controls.append(button);
  }
  const reset=document.createElement('button');reset.textContent='⌖';reset.title='Центрировать карту';reset.onclick=()=>{worldScale=1;worldPan={x:0,y:0};worldCanvasDraw()};controls.append(reset);map.append(controls);
- const legend=document.createElement('div');legend.className='worldlegend';legend.textContent='🟡 Маршрут  ·  🔴 Опасная зона  ·  🌲 Дикая местность';map.append(legend);
- Object.keys(sites).forEach((id,i)=>{const node=map.querySelectorAll('.mapnode')[i];if(node)node.dataset.site=id});
+ const legend=document.createElement('div');legend.className='worldlegend';legend.textContent='🔴 Опасная зона  ·  🌲 Дикая местность';map.append(legend);
+
  worldCanvasDraw();
 };
 const worldMapEl=document.getElementById('worldmap');
@@ -608,7 +602,7 @@ worldMapEl.addEventListener('wheel',e=>{
  e.preventDefault();zoomWorld(Math.exp(-Math.max(-240,Math.min(240,e.deltaY))*.002),localWorldPoint(e));
 },{passive:false});
 worldMapEl.addEventListener('pointerdown',e=>{
- if(e.target.closest('.worldcontrols'))return;
+ if(e.target.closest('button,.cellWheel'))return;
  const pos=localWorldPoint(e);
  if(!touches.size)moved=false;else moved=true;
  touches.set(e.pointerId,{...pos,start:pos});
@@ -634,31 +628,38 @@ worldMapEl.addEventListener('pointerup',e=>{
  const dy=(pos.y-worldMapEl.clientHeight*.40-worldPan.y)/(11*worldScale);
  const x=Math.round((dx+dy)/2),y=Math.round((dy-dx)/2);
  if(Math.abs(x)>24||Math.abs(y)>24)return;
- const landmark=Object.entries(sites).find(([,s])=>Math.round((s.x-50)/4)===x&&Math.round((s.y-50)/4)===y);
- if(landmark){activeSite=landmark[0];selectedCell=null}else selectedCell={x,y};
+ selectedCell={x,y};
  renderWorld();
 });
 window.addEventListener('resize',()=>{if(activeTab==='world')worldCanvasDraw()});
-document.getElementById('goWorld').onclick=()=>{
- if(selectedCell){
-   routeCell={...selectedCell};
-   let opt=$('destination').querySelector('option[value="sector"]');
-   if(!opt){opt=document.createElement('option');opt.value='sector';$('destination').append(opt)}
-   opt.textContent='Клетка ('+routeCell.x+', '+routeCell.y+') · '+sectorMinutes(routeCell)+' мин';
-   $('destination').value='sector';openTab('exp');return;
+function cellDescription(cell){
+ const area=region(cell),key=cellKey(cell),w=state.world;
+ const tags=[w.surveyed?.includes(key)&&'Разведана',w.exploredCells?.includes(key)&&'Исследована',w.posts?.includes(key)&&'Полевой пост'].filter(Boolean);
+ return [area.name+' ('+key+')','Базовый риск '+Math.round(area.risk*100)+'%',...tags].join(' · ');
+}
+function openFieldOrder(cell,action){
+ const dlg=$('fieldOrder'),party=$('fieldParty');
+ $('fieldTitle').textContent=fieldActions[action]+' · '+region(cell).name;
+ $('fieldDetails').textContent=cellDescription(cell)+' · '+fieldDuration(cell,action)+' мин · 3 пайка на человека. '+({scout:'Отметить клетку как разведанную.',research:'Исследовать местность и собрать материалы.',build:'Возвести полевой пост за 20 материалов и 5 металла.'}[action]);
+ party.replaceChildren();$('fieldError').textContent='';
+ for(const p of state.settlers){
+   const label=document.createElement('label'),box=document.createElement('input');
+   box.type='checkbox';box.value=p.id;box.disabled=p.health<=0||p.status!=='дома';
+   label.append(box,p.name+' · '+p.role+' · '+p.status);party.append(label);
  }
- const site=sites[activeSite];if(!site?.type)return;
- document.getElementById('destination').value=site.type;openTab('exp');
- msg('Выбрано место: '+site.name+'. Отправь экспедицию.');
-};
-
-
+ $('fieldSend').onclick=()=>{
+   const ids=[...party.querySelectorAll(':checked')].map(el=>Number(el.value));
+   const error=dispatch(state,cell,action,ids);if(error){$('fieldError').textContent=error;return}
+   logEvent(fieldActions[action]+' · '+cellKey(cell));selectedCell=null;dlg.close();update();
+ };
+ dlg.showModal();
+}
 /* 0.15: real-time expedition completion while open and after reload. */
 function checkExpeditionClock(){
  const due=state.expeditions.some(e=>e.arriveAt&&Date.now()>=e.arriveAt);
  if(due){resolveExpeditions();update();}
  if(activeTab==='world')worldCanvasDraw();
- if(activeTab==='exp'&&state.expeditions.length){const checked=[...$('settlers').querySelectorAll('input:checked')].map(el=>el.value);renderExpeditions();for(const el of $('settlers').querySelectorAll('input:not(:disabled)'))el.checked=checked.includes(el.value)}
+ if(activeTab==='exp'&&state.expeditions.length)renderExpeditions();
 }
 setInterval(checkExpeditionClock,1000);
 checkExpeditionClock();

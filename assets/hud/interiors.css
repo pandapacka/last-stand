@@ -42,3 +42,5 @@ body {background:#161616}
 @media(max-width:520px){#agriculture #plots,#nutrition .peoplegrid{padding:5px}.wrap>section:is(#world,#agriculture,#nutrition,.expeditions){padding:8px}}
 
 #world .worldmap .mapnode{min-width:0;width:25px;height:25px;padding:0;font-size:0;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none}#world .worldmap .mapnode b{font-size:14px}#world .worldmap .mapnode small{display:none}
+
+.cellWheel{position:absolute;z-index:6;width:0;height:0}.cellWheel button{position:absolute;transform:translate(-50%,-50%);background:#34312c;color:#ffe6ac;border:2px solid #8f7854;border-radius:12px;padding:7px 4px;font-size:11px;min-height:38px}.cellWheel button:first-child{left:-55px;top:-13px}.cellWheel button:nth-child(2){top:-54px}.cellWheel button:last-child{left:54px;top:-13px}#fieldOrder{background:var(--case-face);color:#f6ebd5;border:3px solid var(--case-edge);width:min(420px,92vw)}#fieldOrder::backdrop{background:#10100fc9}#fieldParty label{display:block;padding:6px}#fieldOrder form{display:inline}#fieldOrder button{padding:8px 12px}
