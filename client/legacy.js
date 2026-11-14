@@ -56,6 +56,15 @@ $('rotate').onclick=()=>{if(preview){preview.rot=((preview.rot||0)+1)%2;syncPrev
 $('cancel').onclick=()=>{preview=null;syncPreview()};
 $('confirm').onclick=()=>{if(preview&&place(preview.x,preview.y)){preview=null;syncPreview()}};
 let movingGhost=false;
+C.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const focus=worldPointerPosition(e);
+  const pixels=e.deltaY*(e.deltaMode===1?16:e.deltaMode===2?C.clientHeight:1);
+  const next=Math.max(.65,Math.min(2.6,zoom*Math.exp(-Math.max(-240,Math.min(240,pixels))*.002)));
+  panX+=(focus.x-400)*(zoom-next);
+  panY+=(focus.y-225)*(zoom-next);
+  zoom=next;draw();
+},{passive:false});
 const pointers=new Map();let gesture=null,gestureMoved=false,downAt=null;
 function pointerDistance(){let a=[...pointers.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)}
 C.addEventListener('pointerdown',e=>{C.setPointerCapture(e.pointerId);pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pointers.size===1){downAt={x:e.clientX,y:e.clientY,panX,panY};gestureMoved=false;const cell=hit(e);movingGhost=!!preview&&preview.x===cell.x&&preview.y===cell.y}else if(pointers.size===2){movingGhost=false;gesture={dist:pointerDistance(),zoom,panX,panY,midX:([...pointers.values()][0].x+[...pointers.values()][1].x)/2,midY:([...pointers.values()][0].y+[...pointers.values()][1].y)/2};gestureMoved=true}});
@@ -562,6 +571,27 @@ function worldCanvasDraw(){
   c.beginPath();c.arc(px,py,10*worldScale,0,Math.PI*2);c.fillStyle='#f0d68c';c.fill();c.strokeStyle='#24382c';c.lineWidth=2;c.stroke();
   c.font=(12*worldScale)+'px sans-serif';c.textAlign='center';c.fillStyle='#26382b';c.fillText('➤',px,py+4*worldScale);const badge=label+' '+kitchenClock(deadline-now);c.font='bold 12px system-ui';const bw=c.measureText(badge).width+8;c.fillStyle='#201f1b';c.fillRect(px-bw/2,py+10,bw,18);c.fillStyle='#ffdfa1';c.fillText(badge,px,py+23);
  }
+ const orders=el.querySelector('.worldOrders');
+ if(orders){
+   const now=Date.now();
+   const rows=state.expeditions.map(trip=>{
+     const crew=trip.ids.map(id=>state.settlers.find(s=>s.id===id)?.name||'Поселенец').join(', ');
+     const place=trip.cell?region(trip.cell).name+' ('+cellKey(trip.cell)+')':Object.values(sites).find(s=>s.type===trip.type)?.name||missions[trip.type]?.label;
+     const purpose=trip.action==='build'?(trip.kind==='house'?'Построить жилище':'Построить пост'):fieldActions[trip.action]||missions[trip.type]?.label;
+     const half=trip.departAt+(trip.arriveAt-trip.departAt)/2;
+     const stage=now<(trip.siteAt??half)?'В пути':now<(trip.doneAt??0)?'Стройка':'Домой';
+     return [crew,stage+' · '+place,purpose];
+   });
+   const key=JSON.stringify(rows);
+   if(orders.dataset.orders!==key){
+     orders.dataset.orders=key;
+     orders.replaceChildren(...rows.map(([crew,where,why])=>{
+       const card=document.createElement('div'),name=document.createElement('b'),place=document.createElement('span'),task=document.createElement('small');
+       name.textContent=crew;place.textContent=where;task.textContent=why;
+       card.append(name,place,task);return card;
+     }));
+   }
+ }
  const wheel=el.querySelector('.cellWheel');
  if(wheel&&selectedCell){
    const [x,y]=pt(selectedCell.x,selectedCell.y);
@@ -581,7 +611,7 @@ renderWorld=function(){
    map.append(wheel);
  }
  const canvas=document.createElement('canvas');canvas.setAttribute('aria-hidden','true');map.prepend(canvas);
- const hud=document.createElement('div');hud.className='worldhud';hud.textContent='🌍 Окрестности · '+(selectedCell?'Клетка '+selectedCell.x+', '+selectedCell.y:'Карта мира');map.append(hud);
+ const orders=document.createElement('div');orders.className='worldOrders';map.append(orders);
  const controls=document.createElement('div');controls.className='worldcontrols';
  for(const [label,delta] of [['+',.2],['−',-.2]]){
   const button=document.createElement('button');button.textContent=label;button.title=delta>0?'Приблизить':'Отдалить';
