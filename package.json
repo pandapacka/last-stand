@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "node --experimental-strip-types --test shared/placement.test.ts shared/production.test.ts"
+    "test": "node --experimental-strip-types --test shared/placement.test.ts shared/production.test.ts shared/farm.test.ts"
   },
   "dependencies": {
     "phaser": "4.2.1"

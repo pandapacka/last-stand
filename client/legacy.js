@@ -1,3 +1,6 @@
+import {CROPS} from '../shared/crops.ts';
+import {growth,plant,tend,harvest} from '../server/farm.ts';
+import {settleSettlers,mealSatiety} from '../server/settlers.ts';
 import {RECIPES} from '../shared/recipes.ts';
 import {chefLevel,canPrepare,ingredientCount} from '../shared/kitchen.ts';
 import {enqueueDish,finishDishes,settleWorkshops} from '../server/production.ts';
@@ -17,10 +20,7 @@ if (!state.canteenPlaced) {
 }
 const minute=60000;
 function completed(b){return !b.buildEnd || b.buildEnd<=Date.now()}
-function cropEnd(plot,crop){
-  if(!plot.readyAt)plot.readyAt=Date.now()+Math.max(0,crop.days-(plot.progress||0))*10*minute;
-  return plot.readyAt;
-}
+
 const sprites={};
 const art = {
   site:'construction/site', hammer:'construction/hammer', saw:'construction/saw', clock:'construction/clock', canteen:'base/canteen', hq:'base/hq', tower:'base/watchtower', trap:'base/barricade',
@@ -66,7 +66,7 @@ function logEvent(text){state.log.unshift(text);state.log=state.log.slice(0,15)}
 function renderExpeditions(){let box=$('settlers');box.innerHTML='';for(let p of state.settlers){let l=document.createElement('label');l.className='settler'+(p.status!=='дома'?' busy':'');let cb=document.createElement('input');cb.type='checkbox';cb.value=p.id;cb.disabled=p.status!=='дома'||p.health<=0;l.append(cb);l.append(document.createTextNode(' '+p.name));let sub=document.createElement('small');sub.textContent=p.role+' · опыт '+p.skill+' · здоровье '+p.health+' · '+p.status;l.append(sub);box.append(l)}$('missions').innerHTML=state.expeditions.length?state.expeditions.map(e=>'<div class="mission">'+missions[e.type].label+' · '+e.ids.map(id=>state.settlers.find(p=>p.id===id)?.name).join(', ')+' · '+(e.arriveAt?'осталось '+Math.max(0,Math.ceil((e.arriveAt-Date.now())/60000))+' мин':'возвращение: день '+e.returnDay)+'</div>').join(''):'<small>Сейчас никто не в экспедиции.</small>';$('expLog').innerHTML=state.log.length?state.log.map(t=>'<p>'+t+'</p>').join(''):'<small>Пока нет событий.</small>'}
 $('send').onclick=()=>{let ids=[...document.querySelectorAll('#settlers input:checked')].map(x=>+x.value);if(ids.length<1||ids.length>2){msg('Выбери одного или двух свободных поселенцев.');return}let type=$('destination').value,m=missions[type];if(state.food<ids.length*3){msg('Для экспедиции нужно '+ids.length*3+' еды.');return}state.food-=ids.length*3;for(let id of ids)state.settlers.find(p=>p.id===id).status='в экспедиции';state.expeditions.push({type,ids,returnDay:state.day+m.days,departAt:Date.now(),arriveAt:Date.now()+({forest:8,scout:6,city:25,farmstead:15,clinic:30,relay:35}[type]||12)*60000});logEvent('Отряд отправлен: '+m.label+'.');msg('Отряд отправлен. Возвращение по таймеру реального времени.');update()};
 function resolveExpeditions(){let finished=state.expeditions.filter(e=>(e.arriveAt?Date.now()>=e.arriveAt:e.returnDay<=state.day));state.expeditions=state.expeditions.filter(e=>(e.arriveAt?Date.now()<e.arriveAt:e.returnDay>state.day));for(let e of finished){let m=missions[e.type],names=e.ids.map(id=>state.settlers.find(p=>p.id===id)?.name).join(', '),skill=e.ids.reduce((n,id)=>n+state.settlers.find(p=>p.id===id).skill,0)/e.ids.length;let risk=Math.max(.04,m.risk-skill*.018),dead=0,infected=0;for(let id of e.ids){let p=state.settlers.find(p=>p.id===id);p.status='дома';let roll=Math.random();if(roll<risk*.17){p.health=0;p.status='погиб';dead++}else if(roll<risk*.57){p.health=Math.max(10,p.health-25);p.status='заражён';infected++}else if(roll<risk){p.health=Math.max(20,p.health-15)}else p.skill=Math.min(10,p.skill+1)}let survivors=e.ids.filter(id=>state.settlers.find(p=>p.id===id).health>0).length;if(survivors){let gain=(arr)=>Math.floor(arr[0]+Math.random()*(arr[1]-arr[0]+1))*survivors;let f=gain(m.food),w=gain(m.wood),met=gain(m.metal);state.food+=f;state.wood+=w;state.metal+=met;logEvent(names+' вернулись из похода. Добыча: еда '+f+', материалы '+w+', металл '+met+'.'+(infected?' Заражение: '+infected+'.':'')+(dead?' Погибли: '+dead+'.':''))}else logEvent('Экспедиция '+names+' не вернулась. Все погибли.');}}
-function progressInfection(p){p.health=Math.max(0,p.health-9);if(p.health===0){p.status='погиб';logEvent(p.name+' погиб(ла) от инфекции.')} }
+
 const oldUpdate=update;update=function(){oldUpdate();renderExpeditions()};
 $('attack').onclick=()=>{state.wave++;let towers=state.buildings.filter(b=>b.t==='tower'&&completed(b)).length,traps=state.buildings.filter(b=>b.t==='trap'&&completed(b)).length,walls=state.buildings.filter(b=>b.t==='wall'&&completed(b)).length;let enemy=4+state.wave*3,def=towers*4+traps*2+walls;let dmg=Math.max(0,(enemy-def)*6);state.hp=Math.max(0,state.hp-dmg);state.zombies=Array.from({length:Math.min(enemy,12)},(_,i)=>({x:i%2?1:14,y:1+(i*3)%10}));msg(dmg?'Набег! Защита уничтожила часть орды. База потеряла '+dmg+' прочности.':'Набег отбит без потерь!');update();if(state.hp===0)msg('База разрушена. Нажми «Сброс», чтобы начать заново.')};$('reset').onclick=()=>{if(confirm('Начать новую игру?')){state=seed();msg('Новая база готова.');update()}};update();$('zin').onclick=()=>{zoom=Math.min(2.6,zoom+.2);draw()};$('zout').onclick=()=>{zoom=Math.max(.65,zoom-.2);draw()};
 
@@ -93,33 +93,25 @@ if(!state.world.storyDone.length&&!state.world.storyQueue.length){worldMessage('
 update();
 
 // 0.6 — посевы, отдельные семена, урожай и развитие агронома.
-const CROPS=[
-['Картофель','🥔',3,9,2],['Морковь','🥕',3,7,2],['Свёкла','🫜',4,8,2],['Редис','🌱',2,5,2],
-['Репа','🫜',3,7,2],['Пастернак','🌿',4,8,2],['Томат','🍅',5,11,3],['Огурец','🥒',4,9,3],
-['Перец','🫑',6,10,3],['Баклажан','🍆',6,10,3],['Кабачок','🥒',5,12,2],['Тыква','🎃',7,18,3],
-['Капуста','🥬',5,13,3],['Брокколи','🥦',5,9,3],['Цветная капуста','🥦',6,10,3],
-['Горох','🫛',4,8,2],['Фасоль','🫘',5,9,3],['Чечевица','🫘',5,7,2],
-['Пшеница','🌾',6,13,3],['Рожь','🌾',6,12,3],['Овёс','🌾',5,11,2],['Кукуруза','🌽',7,15,3],
-['Гречиха','🌾',5,10,2],['Лук','🧅',4,8,2],['Чеснок','🧄',5,8,2],
-['Укроп','🌿',3,5,2],['Петрушка','🌿',4,6,2],['Салат','🥬',3,6,2],
-['Клубника','🍓',6,9,3],['Малина','🫐',8,10,3],['Подсолнечник','🌻',7,11,3]
-].map(([name,icon,days,yieldAmount,water])=>({name,icon,days,yieldAmount,water}));
+
 state.agri ||= {plots:[],seeds:{},produce:{},farmer:3,auto:false,experience:0};
 let ag=state.agri;
+ag.fertilizer??=100;
 for(const c of CROPS){if(ag.seeds[c.name]===undefined)ag.seeds[c.name]=['Картофель','Морковь','Томат','Горох','Лук','Капуста'].includes(c.name)?5:0}
 function plotCapacity(){return state.buildings.filter(b=>b.t==='farm'&&completed(b)).length*4}
 function normalizePlots(){let n=plotCapacity();while(ag.plots.length<n)ag.plots.push({crop:null,progress:0,water:0});if(ag.plots.length>n)ag.plots.length=n}
 function farmer(){return state.settlers.find(p=>p.id===Number(ag.farmer)&&p.health>0&&p.status==='дома')}
 function farmerBonus(){let p=farmer();return p?(p.id===3?2:0)+Math.floor((p.skill||0)/3):0}
-function harvestPlot(i){let p=ag.plots[i];if(!p||!p.crop||cropEnd(p,CROPS.find(c=>c.name===p.crop))>Date.now())return false;let c=CROPS.find(c=>c.name===p.crop),amount=c.yieldAmount+farmerBonus();ag.produce[c.name]=(ag.produce[c.name]||0)+amount;ag.seeds[c.name]=(ag.seeds[c.name]||0)+Math.max(1,Math.floor(amount/4));let f=farmer();if(f){ag.experience++;if(ag.experience%4===0)f.skill=Math.min(10,f.skill+1)}ag.plots[i]={crop:null,progress:0,water:0};logEvent('Урожай: '+c.name+' ×'+amount+' (семена сохранены).');return true}
-function plantPlot(i){let c=CROPS.find(x=>x.name===$('cropSelect').value),p=ag.plots[i];if(!c||!p||p.crop)return;if((ag.seeds[c.name]||0)<1)return msg('Нет семян '+c.name+'. Ищи их в экспедициях.');ag.seeds[c.name]--;ag.plots[i]={crop:c.name,progress:0,water:2,readyAt:Date.now()+c.days*10*minute};msg('Посажено: '+c.name);update()}
-function renderAgriculture(){normalizePlots();let selected=$('cropSelect').value,c=CROPS.find(x=>x.name===selected)||CROPS[0];$('cropInfo').textContent=c.icon+' '+c.name+' · рост '+(c.days*10)+' мин. · урожай '+c.yieldAmount+'+'+farmerBonus()+' · семян '+ag.seeds[c.name]+' · полив '+c.water;
+function harvestPlot(i){const name=ag.plots[i]?.crop,amount=harvest(state,i);if(amount)logEvent('Урожай: '+name+' ×'+amount+' (семена сохранены).');return !!amount}
+function plantPlot(i){const name=$('cropSelect').value;if(!plant(state,i,name))return msg('Посадка недоступна. Проверь семена.');update()}
+function renderAgriculture(){normalizePlots();let selected=$('cropSelect').value,c=CROPS.find(x=>x.name===selected)||CROPS[0];$('cropInfo').textContent=c.icon+' '+c.name+' · рост '+(c.days*10)+' мин. · урожай '+c.yieldAmount+'+'+farmerBonus()+' · семян '+ag.seeds[c.name]+' · удобрений '+ag.fertilizer;
 $('autoFarm').textContent='Автосбор: '+(ag.auto?'вкл.':'выкл.');
 $('agriSummary').textContent='Грядок: '+ag.plots.length+' · Агроном: '+(farmer()?.name||'не назначен / занят')+' · бонус урожая: +'+farmerBonus();
-let box=$('plots');box.replaceChildren();ag.plots.forEach((p,i)=>{let d=document.createElement('div');d.className='plot';let c=CROPS.find(x=>x.name===p.crop),ready=c&&cropEnd(p,c)<=Date.now();let title=document.createElement('b');title.textContent='Грядка '+(i+1)+' · '+(c?c.icon+' '+c.name:'свободна');d.append(title);
-let detail=document.createElement('small');detail.textContent=c?(ready?'Урожай созрел':kitchenClock(p.readyAt-Date.now())):'Выбери культуру и посади';if(c&&!ready)detail.dataset.end=p.readyAt;d.append(detail);
-if(c){let bar=document.createElement('div');bar.className='progress';let inner=document.createElement('i');inner.style.width=Math.min(100,Math.max(0,100*(1-(p.readyAt-Date.now())/(c.days*10*minute))))+'%';bar.append(inner);d.append(bar)}
-let b=document.createElement('button');b.textContent=!c?'🌱 Посадить':ready?'🧺 Собрать':'💧 Полить';b.onclick=()=>{if(!c)plantPlot(i);else if(ready){harvestPlot(i);update()}else if(state.wood>=1){state.wood--;p.water=Math.min(4,p.water+2);p.readyAt=Math.max(Date.now(),p.readyAt-minute);update()}else msg('Не хватает материалов для полива.')};d.append(b);box.append(d)});
+let box=$('plots');box.replaceChildren();ag.plots.forEach((p,i)=>{let d=document.createElement('div');d.className='plot';let c=CROPS.find(x=>x.name===p.crop),g=c&&growth(p,c),ready=g&&g.remaining===0;let title=document.createElement('b');title.textContent='Грядка '+(i+1)+' · '+(c?c.icon+' '+c.name:'свободна');d.append(title);
+let detail=document.createElement('small');detail.textContent=c?(ready?'Урожай созрел':(g.wet?'Растёт':'Сухо · рост остановлен')+' · осталось '+kitchenClock(g.minutes*minute)+(p.fertilized?' · ×2':'')):'Выбери культуру и посади';d.append(detail);
+if(c){let bar=document.createElement('div');bar.className='progress';let inner=document.createElement('i');inner.style.width=Math.min(100,Math.max(0,100*g.progress))+'%';bar.append(inner);d.append(bar)}
+let b=document.createElement('button');b.textContent=!c?'🌱 Посадить':ready?'🧺 Собрать':'💧 Полить';b.onclick=()=>{if(!c)plantPlot(i);else if(ready){harvestPlot(i);update()}else if(tend(state,[i],'water'))update();else msg('Полив недоступен.')};d.append(b);
+if(c&&!ready){const fertilizer=document.createElement('button');fertilizer.textContent=p.fertilized?'Удобрено ×2':'Удобрить ×2 (−1)';fertilizer.disabled=p.fertilized||ag.fertilizer<1;fertilizer.onclick=()=>{if(tend(state,[i],'fertilize'))update()};d.append(fertilizer)}box.append(d)});
 const stock=$('harvestInventory');stock.replaceChildren();
 for(const [title,items] of [['Урожай',ag.produce],['Семена',ag.seeds]]){
   const block=document.createElement('section'),heading=document.createElement('h3');heading.textContent=title;block.append(heading);
@@ -136,7 +128,7 @@ document.querySelector('.farmTabs').onclick=e=>{
 let sel=$('cropSelect');for(const c of CROPS){let o=document.createElement('option');o.value=c.name;o.textContent=c.icon+' '+c.name;sel.append(o)}sel.onchange=renderAgriculture;
 let fs=$('farmerSelect');let empty=document.createElement('option');empty.value='0';empty.textContent='Без агронома';fs.append(empty);for(let p of state.settlers){let o=document.createElement('option');o.value=p.id;o.textContent=p.name+' · '+p.role;fs.append(o)}fs.value=String(ag.farmer);fs.onchange=()=>{ag.farmer=Number(fs.value);update()};
 $('autoFarm').onclick=()=>{ag.auto=!ag.auto;update()};
-$('waterAll').onclick=()=>{if(state.wood<3)return msg('Нужно 3 материала.');state.wood-=3;ag.plots.filter(p=>p.crop).forEach(p=>{p.water=Math.min(4,p.water+2);p.readyAt=Math.max(Date.now(),p.readyAt-minute)});update()};
+$('waterAll').onclick=()=>{if(tend(state,ag.plots.map((_,i)=>i),'water',Date.now(),true))update();else msg('Нет грядок для полива или недостаточно материалов.')};
 const agriOldUpdate=update;
 update=function(){agriOldUpdate();renderAgriculture()};
 const agriOldResolve=resolveExpeditions;
@@ -200,7 +192,7 @@ function cookRecipe(i){
   logEvent('На кухне начали готовить «'+RECIPES[i].name+'».');
   update();renderKitchenQueue();
 }
-const mealSatiety=18;
+
 const dishGroups=['Все','Супы','Напитки','Горячее','Каши','Выпечка'];
 let dishGroup='Все', selectedDish=0;
 function dishKind(r){
@@ -267,11 +259,6 @@ state.nutrition ||= {mode:'variety',auto:false,target:10,people:{},history:[]};
 const nt=state.nutrition;
 for(const p of state.settlers){nt.people[p.id] ||= {hunger:85,morale:65,history:[],favorite:({1:'Суп',2:'Картофель',3:'Овощ',4:'Мясо',5:'Каша'})[p.id]||'Суп'};}
 function availableMeals(){return Object.entries(ck.meals).filter(([n,q])=>q>0).map(([n,q])=>({name:n,qty:q,recipe:RECIPES.find(r=>r.name===n)}));}
-function chooseMeal(p){let meals=availableMeals();if(!meals.length)return null;let record=nt.people[p.id],recent=record.history.slice(-3);let mode=nt.mode;
-meals.sort((a,b)=>{let score=m=>{let quality=m.recipe?.food||5;let repetition=recent.includes(m.name)?-15:4;let preference=m.name.includes(record.favorite)?5:0;return (mode==='save'?-quality:mode==='best'?quality*2:quality/2+repetition)+preference};return score(b)-score(a)});return meals[0];}
-function feedSettler(p){let results=[];let n=nt.people[p.id] ||= {hunger:85,morale:65,history:[],favorite:'Суп'};let meal=chooseMeal(p);if(meal){ck.meals[meal.name]--;n.history.push(meal.name);n.history=n.history.slice(-7);n.hunger=Math.min(100,n.hunger+mealSatiety);let unique=new Set(n.history.slice(-4)).size;n.morale=Math.min(100,n.morale+(unique>=3?3:unique===1?-2:1));results.push(p.name+': '+meal.name)}else if(state.food>=2){state.food-=2;n.hunger=Math.min(100,n.hunger+7);n.morale=Math.max(0,n.morale-2);results.push(p.name+': аварийный паёк')}else{n.hunger=Math.max(0,n.hunger-23);n.morale=Math.max(0,n.morale-7);if(n.hunger<35){p.health=Math.max(0,p.health-8);if(!p.health)p.status='погиб'}results.push(p.name+': голод')}
-if(p.status!=='дома'){n.hunger=Math.max(0,n.hunger-5)}
-logEvent('Питание: '+results.join('; ')+'.');}
 function autoCookDay(){if(!nt.auto)return;let goal=nt.target;for(let i=0;i<goal&&availableMeals().reduce((a,b)=>a+b.qty,0)<goal;i++){let ready=RECIPES.filter(r=>canCook(r));if(!ready.length)break;ready.sort((a,b)=>b.food-a.food);cookRecipe(RECIPES.indexOf(ready[0]));}}
 function renderNutrition(){document.getElementById('dietMode').value=nt.mode;document.getElementById('autoCook').value=nt.auto?'on':'off';document.getElementById('mealTarget').value=String(nt.target);let alive=state.settlers.filter(p=>p.health>0),avg=Math.round(alive.reduce((a,p)=>a+(nt.people[p.id]?.morale||0),0)/Math.max(1,alive.length));$('dietSummary').textContent='Живых: '+alive.length+' · Средняя мораль: '+avg+' · Блюд готово: '+availableMeals().reduce((a,b)=>a+b.qty,0)+' · Аварийные пайки: '+state.food;
 let root=$('dietPeople');root.replaceChildren();for(const p of state.settlers){let n=nt.people[p.id];let div=document.createElement('div');div.className='person';let b=document.createElement('b');b.textContent=p.name+' · '+p.role;div.append(b);let info=document.createElement('small');info.textContent=(p.health<=0?'Погиб':p.status)+' · здоровье '+p.health+' · голод '+n.hunger+'/100 · мораль '+n.morale+'/100';div.append(info);for(let [label,value] of [['Сытость',n.hunger],['Мораль',n.morale]]){let cap=document.createElement('small');cap.textContent=label;div.append(cap);let meter=document.createElement('div');meter.className='meter';let bar=document.createElement('i');bar.style.width=value+'%';bar.style.background=value<35?'#cf7868':'#a5bd70';meter.append(bar);div.append(meter)}let hist=document.createElement('small');hist.textContent='Любит: '+n.favorite+' · Недавно: '+(n.history.slice(-3).join(', ')||'нет');div.append(hist);root.append(div)}$('dietStore').textContent='Готовые блюда: '+(availableMeals().map(m=>m.name+' ×'+m.qty).join(' · ')||'нет. Приготовь на кухне или включи автоготовку.');}
@@ -668,19 +655,20 @@ document.querySelector('.toolbar').classList.add('game-tab-hidden');
 function reconcileJobs(){
   const now=Date.now();
   let changed=settleWorkshops(state,now);
-  for(const p of state.settlers){
-    if(p.health<=0)continue;
-    if(!p.mealAt){p.mealAt=now+(55+p.id)*minute;changed=true}
-    if(p.mealAt<=now){feedSettler(p);p.mealAt=now+60*minute;changed=true}
-    if(p.status==='заражён'){
-      if(!p.infectionAt){p.infectionAt=now+30*minute;changed=true}
-      if(p.infectionAt<=now){progressInfection(p);p.infectionAt=now+30*minute;changed=true}
-    }
-  }
+  if(settleSettlers(state,logEvent,now))changed=true;
   for(const [i,p] of ag.plots.entries()){
-    if(!p.crop)continue;
-    const c=CROPS.find(c=>c.name===p.crop);if(!c)continue;
-    if(cropEnd(p,c)<=now){if(ag.auto){harvestPlot(i);changed=true}else if(p.progress!==c.days){p.progress=c.days;changed=true}}
+    const c=CROPS.find(c=>c.name===p.crop);
+    if(!c||growth(p,c,now).remaining>0)continue;
+    if(ag.auto){harvestPlot(i);changed=true}
+    else if(p.progress!==c.days){p.progress=c.days;changed=true}
+  }
+  if(activeTab==='farm'&&!$('farmBeds').hidden&&!changed){
+    for(const [i,p] of ag.plots.entries()){
+      const c=CROPS.find(c=>c.name===p.crop);if(!c)continue;
+      const g=growth(p,c,now),row=$('plots').children[i];if(!row||!g.remaining)continue;
+      row.querySelector('small').textContent=(g.wet?'Растёт':'Сухо · рост остановлен')+' · осталось '+kitchenClock(g.minutes*minute)+(p.fertilized?' · ×2':'');
+      row.querySelector('.progress i').style.width=100*g.progress+'%';
+    }
   }
   if(nt.auto&&ck.queue.length<5&&availableMeals().reduce((n,m)=>n+m.qty,0)+ck.queue.length<nt.target){
     const r=RECIPES.find(canCook);if(r)cookRecipe(RECIPES.indexOf(r));
