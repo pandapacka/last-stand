@@ -80,7 +80,7 @@ let selectedCell=null;
 function worldMessage(title,body,choices){state.world.storyQueue.push({title,body,choices});}
 function renderWorld(){const w=state.world;const map=$('worldmap');map.innerHTML='';$('radioStatus').textContent=w.radio?'📻 Рация работает · канал выживших открыт (сеть пока не реализована)':'📻 Связь отсутствует · альянсы недоступны';const panel=$('story');panel.innerHTML='';if(w.storyQueue.length){const event=w.storyQueue[0];let h=document.createElement('strong');h.textContent=event.title;panel.append(h);let p=document.createElement('p');p.textContent=event.body;panel.append(p);event.choices.forEach((c,i)=>{let btn=document.createElement('button');btn.textContent=c.label;btn.onclick=()=>{w.storyQueue.shift();applyChoice(c);update()};panel.append(btn)})}else{panel.innerHTML='<strong>📖 Журнал истории</strong><p>'+(w.radio?'Радиоканал открыт. Другие выжившие существуют, но серверная MMO ещё не подключена.':w.chapter?'Находки складываются в картину. Радиовышка может оказаться ключом к связи.':'День первый. За оградой — тишина. Нужно исследовать окрестности и найти следы пропавших людей.')+'</p>'}}
 function applyChoice(c){const w=state.world;if(c.effect==='radio'){w.radio=true;logEvent('Восстановлена рация. Связь с другими поселениями теперь возможна.')}else if(c.effect==='food'){state.food+=15;logEvent('Найдены дополнительные консервы: +15 еды.')}else if(c.effect==='metal'){state.metal+=12;logEvent('Сохранены радиодетали: +12 металла.')}else if(c.effect==='clue'){if(!w.clues.includes('frequency'))w.clues.push('frequency');logEvent('Записана аварийная частота.')}else if(c.effect==='none')logEvent('Решение принято: '+c.label);}
-function worldDiscovery(e){if(e.cell&&e.action){finishCell(state,e.cell,e.action);return}if(e.cell){state.world.exploredCells??=[];const key=e.cell.x+','+e.cell.y;if(!state.world.exploredCells.includes(key))state.world.exploredCells.push(key);return}const w=state.world,id=e.type; if(!w.visited.includes(id))w.visited.push(id);if(id==='scout'){for(let key of ['farmstead','clinic','relay'])if(!w.discovered.includes(key))w.discovered.push(key);if(!w.storyDone.includes('scout')){w.storyDone.push('scout');w.chapter=1;worldMessage('Глава I · Следы эвакуации','На старой дороге разведчики нашли автобус с заколоченными окнами. На приборной панели — карта с отметкой радиовышки. Рядом лежит блокнот: «Не доверяйте голосам на общей частоте».',[{label:'Забрать карту и записать частоту',effect:'clue'},{label:'Забрать полезные детали',effect:'metal'}])}}
+function worldDiscovery(e){if(e.cell&&e.action){finishCell(state,e.cell,e.action);if(e.kind){state.world.structures??={};state.world.structures[cellKey(e.cell)]=e.kind}return}if(e.cell){state.world.exploredCells??=[];const key=e.cell.x+','+e.cell.y;if(!state.world.exploredCells.includes(key))state.world.exploredCells.push(key);return}const w=state.world,id=e.type; if(!w.visited.includes(id))w.visited.push(id);if(id==='scout'){for(let key of ['farmstead','clinic','relay'])if(!w.discovered.includes(key))w.discovered.push(key);if(!w.storyDone.includes('scout')){w.storyDone.push('scout');w.chapter=1;worldMessage('Глава I · Следы эвакуации','На старой дороге разведчики нашли автобус с заколоченными окнами. На приборной панели — карта с отметкой радиовышки. Рядом лежит блокнот: «Не доверяйте голосам на общей частоте».',[{label:'Забрать карту и записать частоту',effect:'clue'},{label:'Забрать полезные детали',effect:'metal'}])}}
 if(id==='farmstead'&&!w.storyDone.includes('farmstead')){w.storyDone.push('farmstead');worldMessage('Теплицы без хозяев','В теплице сохранились пакеты семян и банки с едой. На стене — странные царапины, будто растения пытались выбраться наружу.',[{label:'Забрать продукты (+15 еды)',effect:'food'},{label:'Зафиксировать необычные следы',effect:'none'}])}
 if(id==='city'&&!w.storyDone.includes('city')){w.storyDone.push('city');worldMessage('Город · Квартира № 17','За запертой дверью слышится стук. Внутри обнаружена работающая радиостанция, но её антенна сломана. На стене записана частота аварийной связи.',[{label:'Записать частоту',effect:'clue'},{label:'Разобрать оборудование (+12 металла)',effect:'metal'}])}
 if(id==='relay'&&!w.storyDone.includes('relay')){w.storyDone.push('relay');worldMessage('Глава II · Голоса в эфире','На вершине вышки сохранился аварийный радиоблок. В динамике треск и обрывок сообщения: «Если кто-то слышит — ответьте…» Вы можете наладить связь, но это выдаст ваше присутствие.',[{label:'Восстановить радиосвязь',effect:'radio'},{label:'Пока оставить передатчик выключенным',effect:'none'}])}
@@ -539,7 +539,8 @@ function worldCanvasDraw(){
  ellipse(8,-7,3,4,'#a3444036');
  ellipse(-8,7,3,4,'#c9a94c19');
  if(selectedCell)tile(selectedCell.x,selectedCell.y,'#ddb15aa8');
- for(const key of state.world.posts||[]){const [x,y]=key.split(',').map(Number);const [px,py]=pt(x,y);paintSprite(c,'tower',px,py,25*worldScale)}
+ for(const key of state.world.posts||[]){const [x,y]=key.split(',').map(Number);const [px,py]=pt(x,y);paintSprite(c,state.world.structures?.[key]||'tower',px,py,36*worldScale)}
+ const homePos=pt(-.75,.75);paintSprite(c,'hq',...homePos,52*worldScale);
  // Real-time expedition markers move along the route, including after page reload.
  for(const expedition of state.expeditions){
   if(!expedition.departAt||!expedition.arriveAt)continue;
@@ -547,10 +548,19 @@ function worldCanvasDraw(){
   if(!destination&&!expedition.cell)continue;
   const progress=Math.max(0,Math.min(1,(Date.now()-expedition.departAt)/(expedition.arriveAt-expedition.departAt)));
   const h=pt((sites.home.x-50)/4,(sites.home.y-50)/4),d=expedition.cell?pt(expedition.cell.x,expedition.cell.y):pt((destination.x-50)/4,(destination.y-50)/4);
-  const travel=progress<.5?progress*2:2-progress*2;
+  const now=Date.now(),work=expedition.siteAt&&now>=expedition.siteAt&&now<expedition.doneAt;
+  let travel=progress<.5?progress*2:2-progress*2;
+  let deadline=progress<.5?(expedition.departAt+expedition.arriveAt)/2:expedition.arriveAt,label=progress<.5?'В пути':'Домой';
+  if(expedition.siteAt){
+    travel=Math.min(1,Math.max(0,(now-expedition.departAt)/(expedition.siteAt-expedition.departAt)),Math.max(0,(expedition.arriveAt-now)/(expedition.arriveAt-expedition.doneAt)));
+    deadline=now<expedition.siteAt?expedition.siteAt:work?expedition.doneAt:expedition.arriveAt;
+    label=now<expedition.siteAt?'В пути':work?'Стройка':'Домой';
+    paintSprite(c,now>=expedition.doneAt?expedition.kind:'site',...d,38*worldScale);
+    if(now<expedition.doneAt){c.save();c.globalAlpha=.58;paintSprite(c,expedition.kind,d[0],d[1]-12*worldScale,32*worldScale);c.restore()}
+  }
   const px=h[0]+(d[0]-h[0])*travel,py=h[1]+(d[1]-h[1])*travel-12*worldScale*Math.sin(travel*Math.PI);
   c.beginPath();c.arc(px,py,10*worldScale,0,Math.PI*2);c.fillStyle='#f0d68c';c.fill();c.strokeStyle='#24382c';c.lineWidth=2;c.stroke();
-  c.font=(12*worldScale)+'px sans-serif';c.textAlign='center';c.fillStyle='#26382b';c.fillText('➤',px,py+4*worldScale);
+  c.font=(12*worldScale)+'px sans-serif';c.textAlign='center';c.fillStyle='#26382b';c.fillText('➤',px,py+4*worldScale);const badge=label+' '+kitchenClock(deadline-now);c.font='bold 12px system-ui';const bw=c.measureText(badge).width+8;c.fillStyle='#201f1b';c.fillRect(px-bw/2,py+10,bw,18);c.fillStyle='#ffdfa1';c.fillText(badge,px,py+23);
  }
  const wheel=el.querySelector('.cellWheel');
  if(wheel&&selectedCell){
@@ -641,6 +651,8 @@ function openFieldOrder(cell,action){
  const dlg=$('fieldOrder'),party=$('fieldParty');
  $('fieldTitle').textContent=fieldActions[action]+' · '+region(cell).name;
  $('fieldDetails').textContent=cellDescription(cell)+' · '+fieldDuration(cell,action)+' мин · 3 пайка на человека. '+({scout:'Отметить клетку как разведанную.',research:'Исследовать местность и собрать материалы.',build:'Возвести полевой пост за 20 материалов и 5 металла.'}[action]);
+ const select=$('fieldKind');select.hidden=action!=='build';select.value='';party.hidden=action==='build';$('fieldSend').disabled=action==='build';
+ select.onchange=()=>{party.hidden=!select.value;$('fieldSend').disabled=!select.value;$('fieldDetails').textContent=cellDescription(cell)+' · путь '+Math.max(1,fieldDuration(cell,'build')-10)+' мин в одну сторону · стройка '+(select.value==='house'?30:10)+' мин · 20 материалов и 5 металла'};
  party.replaceChildren();$('fieldError').textContent='';
  for(const p of state.settlers){
    const label=document.createElement('label'),box=document.createElement('input');
@@ -649,7 +661,7 @@ function openFieldOrder(cell,action){
  }
  $('fieldSend').onclick=()=>{
    const ids=[...party.querySelectorAll(':checked')].map(el=>Number(el.value));
-   const error=dispatch(state,cell,action,ids);if(error){$('fieldError').textContent=error;return}
+   const error=dispatch(state,cell,action,ids,Date.now(),select.value||'tower');if(error){$('fieldError').textContent=error;return}
    logEvent(fieldActions[action]+' · '+cellKey(cell));selectedCell=null;dlg.close();update();
  };
  dlg.showModal();
