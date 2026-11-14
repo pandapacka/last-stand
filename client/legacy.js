@@ -348,7 +348,8 @@ function inspectCell(x,y){
   const actions=[];
   function add(icon,label,run){actions.push({icon,label,run})}
   if(!b)add('⚒','Строить',()=>{changeMapMode('build');preview={x,y,t:selected,rot:0};syncPreview()});
-  else if(!buildingSite){
+  else if(buildingSite)add('»','Ускорить',finishConstruction);
+  else {
     if(b.t==='canteen'){
       add('↗','Открыть',()=>openKitchen());add('⬆','Улучшить',()=>openKitchen('settings'));add('♟','Повара',()=>openKitchen('crew'));
     }else if(b.t==='hq'||b.t==='house'){
@@ -363,10 +364,14 @@ function inspectCell(x,y){
   header.className='objectHead';name.textContent=title;close.textContent='✕';close.setAttribute('aria-label','Закрыть');close.onclick=closeBuildingPanel;header.append(name,close);
   const tabs=document.createElement('div'),body=document.createElement('div');tabs.className='objectTabs';body.className='objectBody';
   const info=document.createElement('button'),commands=document.createElement('button');info.textContent='Сведения';commands.textContent='Действия';
+  function finishConstruction(){
+    if(b.buildEnd>Date.now())b.buildEnd=Date.now();
+    reconcileJobs();inspectCell(x,y);
+  }
   function showInfo(){
     info.setAttribute('aria-pressed','true');commands.setAttribute('aria-pressed','false');
     body.textContent='Клетка '+(x+1)+' × '+(y+1);
-    if(buildingSite){const timer=document.createElement('b');timer.dataset.end=b.buildEnd;timer.textContent=kitchenClock(b.buildEnd-Date.now());body.append(' · Строительство ',timer,speedButton(()=>{if(b.buildEnd>Date.now())b.buildEnd=Date.now();reconcileJobs();inspectCell(x,y)}))}
+    if(buildingSite){const timer=document.createElement('b');timer.dataset.end=b.buildEnd;timer.textContent=kitchenClock(b.buildEnd-Date.now());body.append(' · Строительство ',timer,speedButton(finishConstruction))}
     else if(b){const descriptions={hq:'Управление убежищем',tower:'Защита при набеге +4',trap:'Защита при набеге +2',wall:'Защита при набеге +1',canteen:'Кухня · уровень '+ck.kitchen,farm:'4 грядки',house:'Жилое здание',scrap:'Производство материалов'};body.append(' · '+(descriptions[b.t]||title))}
   }
   function makeButton(action,radial){
@@ -382,9 +387,9 @@ function inspectCell(x,y){
   panel.replaceChildren(header,tabs,body);panel.hidden=false;showInfo();
   if(!b)return;
   selectedBuilding=b;wheel.replaceChildren();
-  const ring=[{icon:'ⓘ',label:'Сведения',run:showInfo},...actions.filter(a=>a.label!=='Сброс')];
+  const ring=buildingSite?actions:[{icon:'ⓘ',label:'Сведения',run:showInfo},...actions.filter(a=>a.label!=='Сброс')];
   ring.forEach((a,i)=>{
-    const btn=makeButton(a,true);if(i===0)btn.onclick=showInfo;
+    const btn=makeButton(a,true);if(!buildingSite&&i===0)btn.onclick=showInfo;
     const angle=ring.length===1?-Math.PI/2:-Math.PI+i*Math.PI/(ring.length-1);
     btn.style.left=(Math.cos(angle)*61)+'px';btn.style.top=(Math.sin(angle)*53)+'px';wheel.append(btn);
   });

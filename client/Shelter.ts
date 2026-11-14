@@ -28,6 +28,10 @@ export class Shelter extends Phaser.Scene{
   pick(x:number,y:number){
     const ordered=[...this.model().state.buildings].sort((a,b)=>isoSortKey(b.x,b.y)-isoSortKey(a.x,a.y));
     for(const b of ordered){
+      const timer=this.labels.get('b'+b.x+','+b.y);
+      if(timer && (b.buildEnd??0)>Date.now() && Math.abs(x-timer.x)<=timer.width/2 && y>=timer.y && y<=timer.y+timer.height)return b;
+    }
+    for(const b of ordered){
       const image=this.buildings.get('b'+b.x+','+b.y);if(!image)continue;
       const u=(x-image.x)/image.scaleX+image.width/2,v=(y-image.y)/image.scaleY+image.height;
       if(u>=0&&u<image.width&&v>=0&&v<image.height&&(this.textures.getPixelAlpha(Math.floor(image.flipX?image.width-1-u:u),Math.floor(v),image.texture.key)??0)>35)return b;
