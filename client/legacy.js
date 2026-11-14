@@ -17,6 +17,33 @@ const activeKey=sessionStorage.getItem('activeShelter')||'-1,1';
 const [homeX,homeY]=activeKey.split(',').map(Number);
 const origin={x:homeX,y:homeY};
 const slot=activeKey==='-1,1'?saveKey:saveKey+':'+activeKey;
+function localResidents(){return state.settlers.filter(p=>p.health>0&&p.status!=='в экспедиции')}
+function emptySettlement(){
+ const s=seed();s.settlers=[];s.people=0;s.buildings=s.buildings.filter(b=>b.t==='hq');return s;
+}
+function settleFounders(now){
+ let changed=false;
+ for(const trip of [...state.expeditions]){
+   if(trip.kind!=='house'||!trip.cell||trip.doneAt>now||!trip.doneAt)continue;
+   const key=cellKey(trip.cell),destSlot=saveKey+':'+key;
+   const dest=JSON.parse(localStorage.getItem(destSlot)||'null')||emptySettlement();
+   for(const id of trip.ids){
+     const person=state.settlers.find(p=>p.id===id);
+     if(!person||person.health<=0)continue;
+     const resident={...person,status:'дома'};
+     dest.settlers=dest.settlers.filter(p=>p.id!==id);dest.settlers.push(resident);
+     const diet=state.nutrition?.people?.[id];
+     if(diet){dest.nutrition??={mode:'variety',auto:false,target:10,people:{},history:[]};dest.nutrition.people[id]=diet}
+   }
+   dest.people=dest.settlers.filter(p=>p.health>0&&p.status!=='в экспедиции').length;
+   localStorage.setItem(destSlot,JSON.stringify(dest));
+   state.settlers=state.settlers.filter(p=>!trip.ids.includes(p.id));
+   state.expeditions=state.expeditions.filter(e=>e!==trip);
+   finishCell(state,trip.cell,'build');state.world.structures??={};state.world.structures[key]='house';
+   registerSites();save();changed=true;
+ }
+ return changed;
+}
 function enterShelter(key){
  if(key===activeKey){openTab('base');return}
  save();sessionStorage.setItem('activeShelter',key);location.reload();
@@ -30,8 +57,8 @@ function registerSites(){
  return known;
 }
 try{state=slot===saveKey?readSave(localStorage)||seed():JSON.parse(localStorage.getItem(slot)||'null');
- if(!state){state=seed();state.buildings=state.buildings.filter(b=>b.t==='hq')}
-}catch{state=seed()}if(!Array.isArray(state.settlers)){state.settlers=initialSettlers();state.expeditions=[];state.log=[];state.people=state.settlers.length}state.expeditions ||= [];state.log ||= [];const inside=(x,y)=>x>=4&&x<=10&&y>=3&&y<=8;const occupied=(x,y)=>state.buildings.some(b=>b.x===x&&b.y===y);const $=id=>document.getElementById(id);const save=()=>{try{localStorage.setItem(slot,JSON.stringify(state))}catch{}};const msg=t=>$('message').textContent=t;function renderUI(){state.people=state.settlers.filter(p=>p.health>0).length;for(let k of ['food','wood','metal','people','hp'])$(k).textContent=state[k];$('day').textContent='День '+state.day;$('wave').textContent=state.wave?'Набегов: '+state.wave:'Угроза: низкая';document.querySelectorAll('.tool').forEach(el=>el.classList.toggle('active',el.dataset.t===selected))}let zoom=1,panX=0,panY=0,preview=null;
+ if(!state)state=emptySettlement()
+}catch{state=seed()}if(!Array.isArray(state.settlers)){state.settlers=initialSettlers();state.expeditions=[];state.log=[];state.people=state.settlers.length}state.expeditions ||= [];state.log ||= [];const inside=(x,y)=>x>=4&&x<=10&&y>=3&&y<=8;const occupied=(x,y)=>state.buildings.some(b=>b.x===x&&b.y===y);const $=id=>document.getElementById(id);const save=()=>{try{localStorage.setItem(slot,JSON.stringify(state))}catch{}};const msg=t=>$('message').textContent=t;function renderUI(){state.people=localResidents().length;for(let k of ['food','wood','metal','people','hp'])$(k).textContent=state[k];$('day').textContent='День '+state.day;$('wave').textContent=state.wave?'Набегов: '+state.wave:'Угроза: низкая';document.querySelectorAll('.tool').forEach(el=>el.classList.toggle('active',el.dataset.t===selected))}let zoom=1,panX=0,panY=0,preview=null;
 defs.canteen={name:'Столовая',icon:'🍲',cost:[0,45,15]};
 if (!state.canteenPlaced) {
   let tile;
@@ -68,7 +95,7 @@ function worldPointerPosition(e){
  return {x:((e.clientX-r.left)/r.width*800-400-panX)/zoom+400,y:((e.clientY-r.top)/r.height*640-225-panY)/zoom+225};
 }
 function hit(e){const p=worldPointerPosition(e);return cellAt(p.x,p.y)}
-function update(){renderUI();draw();save()}for(let [t,d] of Object.entries(defs)){let el=document.createElement('button');el.className='tool';el.dataset.t=t;el.innerHTML=`<span>${d.icon}</span>${d.name}<small>${d.cost[0]?'🥫'+d.cost[0]+' ':''}${d.cost[1]?'🪵'+d.cost[1]+' ':''}${d.cost[2]?'⚙️'+d.cost[2]:''}</small>`;el.onclick=()=>{selected=t;preview=null;syncPreview();renderUI();msg('Выбрано: '+d.name+'. Нажми на клетку для предпросмотра.')};$('tools').append(el)}function place(x,y){if(x<0||x>=W||y<0||y>=H)return;let b=state.buildings.find(b=>b.x===x&&b.y===y);if(selected==='remove'){if(!b||b.t==='hq')return msg('Этот объект нельзя убрать.');state.buildings=state.buildings.filter(q=>q!==b);msg('Объект разобран.');return update()}const error=construct(state,{x,y,t:selected,rot:preview?.rot||0});
+function update(){renderUI();draw();save()}for(let [t,d] of Object.entries(defs)){let el=document.createElement('button');el.className='tool';el.dataset.t=t;el.innerHTML=`<span>${d.icon}</span>${d.name}<small>${d.cost[0]?'🥫'+d.cost[0]+' ':''}${d.cost[1]?'🪵'+d.cost[1]+' ':''}${d.cost[2]?'⚙️'+d.cost[2]:''}</small>`;el.onclick=()=>{selected=t;preview=null;syncPreview();renderUI();msg('Выбрано: '+d.name+'. Нажми на клетку для предпросмотра.')};$('tools').append(el)}function place(x,y){if(!localResidents().length)return msg('В убежище нет жителей.');if(x<0||x>=W||y<0||y>=H)return;let b=state.buildings.find(b=>b.x===x&&b.y===y);if(selected==='remove'){if(!b||b.t==='hq')return msg('Этот объект нельзя убрать.');state.buildings=state.buildings.filter(q=>q!==b);msg('Объект разобран.');return update()}const error=construct(state,{x,y,t:selected,rot:preview?.rot||0});
 if(error){msg(error);return false}
 msg('Строительство: '+defs[selected].name);update();return true}
 function syncPreview(){let el=$('placement');el.hidden=!preview;const reason=preview?constructionError(state,preview):'';$('confirm').disabled=!!reason;if(reason)msg(reason);if(preview)$('placementlabel').textContent=defs[preview.t].name+' · '+(preview.x+1)+','+(preview.y+1);draw()}
@@ -292,8 +319,8 @@ const nt=state.nutrition;
 for(const p of state.settlers){nt.people[p.id] ||= {hunger:85,morale:65,history:[],favorite:({1:'Суп',2:'Картофель',3:'Овощ',4:'Мясо',5:'Каша'})[p.id]||'Суп'};}
 function availableMeals(){return Object.entries(ck.meals).filter(([n,q])=>q>0).map(([n,q])=>({name:n,qty:q,recipe:RECIPES.find(r=>r.name===n)}));}
 function autoCookDay(){if(!nt.auto)return;let goal=nt.target;for(let i=0;i<goal&&availableMeals().reduce((a,b)=>a+b.qty,0)<goal;i++){let ready=RECIPES.filter(r=>canCook(r));if(!ready.length)break;ready.sort((a,b)=>b.food-a.food);cookRecipe(RECIPES.indexOf(ready[0]));}}
-function renderNutrition(){document.getElementById('dietMode').value=nt.mode;document.getElementById('autoCook').value=nt.auto?'on':'off';document.getElementById('mealTarget').value=String(nt.target);let alive=state.settlers.filter(p=>p.health>0),avg=Math.round(alive.reduce((a,p)=>a+(nt.people[p.id]?.morale||0),0)/Math.max(1,alive.length));$('dietSummary').textContent='Живых: '+alive.length+' · Средняя мораль: '+avg+' · Блюд готово: '+availableMeals().reduce((a,b)=>a+b.qty,0)+' · Аварийные пайки: '+state.food;
-let root=$('dietPeople');root.replaceChildren();for(const p of state.settlers){let n=nt.people[p.id];let div=document.createElement('div');div.className='person';let b=document.createElement('b');b.textContent=p.name+' · '+p.role;div.append(b);let info=document.createElement('small');info.textContent=(p.health<=0?'Погиб':p.status)+' · здоровье '+p.health+' · голод '+n.hunger+'/100 · мораль '+n.morale+'/100';div.append(info);for(let [label,value] of [['Сытость',n.hunger],['Мораль',n.morale]]){let cap=document.createElement('small');cap.textContent=label;div.append(cap);let meter=document.createElement('div');meter.className='meter';let bar=document.createElement('i');bar.style.width=value+'%';bar.style.background=value<35?'#cf7868':'#a5bd70';meter.append(bar);div.append(meter)}let hist=document.createElement('small');hist.textContent='Любит: '+n.favorite+' · Недавно: '+(n.history.slice(-3).join(', ')||'нет');div.append(hist);root.append(div)}$('dietStore').textContent='Готовые блюда: '+(availableMeals().map(m=>m.name+' ×'+m.qty).join(' · ')||'нет. Приготовь на кухне или включи автоготовку.');}
+function renderNutrition(){document.getElementById('dietMode').value=nt.mode;document.getElementById('autoCook').value=nt.auto?'on':'off';document.getElementById('mealTarget').value=String(nt.target);let alive=localResidents(),avg=Math.round(alive.reduce((a,p)=>a+(nt.people[p.id]?.morale||0),0)/Math.max(1,alive.length));$('dietSummary').textContent='Живых: '+alive.length+' · Средняя мораль: '+avg+' · Блюд готово: '+availableMeals().reduce((a,b)=>a+b.qty,0)+' · Аварийные пайки: '+state.food;
+let root=$('dietPeople');root.replaceChildren();for(const p of alive){let n=nt.people[p.id];let div=document.createElement('div');div.className='person';let b=document.createElement('b');b.textContent=p.name+' · '+p.role;div.append(b);let info=document.createElement('small');info.textContent=(p.health<=0?'Погиб':p.status)+' · здоровье '+p.health+' · голод '+n.hunger+'/100 · мораль '+n.morale+'/100';div.append(info);for(let [label,value] of [['Сытость',n.hunger],['Мораль',n.morale]]){let cap=document.createElement('small');cap.textContent=label;div.append(cap);let meter=document.createElement('div');meter.className='meter';let bar=document.createElement('i');bar.style.width=value+'%';bar.style.background=value<35?'#cf7868':'#a5bd70';meter.append(bar);div.append(meter)}let hist=document.createElement('small');hist.textContent='Любит: '+n.favorite+' · Недавно: '+(n.history.slice(-3).join(', ')||'нет');div.append(hist);root.append(div)}$('dietStore').textContent='Готовые блюда: '+(availableMeals().map(m=>m.name+' ×'+m.qty).join(' · ')||'нет. Приготовь на кухне или включи автоготовку.');}
 $('dietMode').onchange=()=>{nt.mode=$('dietMode').value;update()};$('autoCook').onchange=()=>{nt.auto=$('autoCook').value==='on';update()};$('mealTarget').onchange=()=>{nt.target=Number($('mealTarget').value);update()};
 const oldUpdate08=update;update=function(){oldUpdate08();renderNutrition()};update();
 
@@ -433,7 +460,7 @@ function speedTrip(trip,whole=false){
  const shift=Math.max(0,end-now);
  for(const key of ['departAt','siteAt','doneAt','arriveAt'])if(trip[key])trip[key]-=shift;
  if(!trip.arriveAt)trip.returnDay=state.day;
- if(trip.arriveAt<=now||!trip.arriveAt)resolveExpeditions();
+ settleFounders(now);if(state.expeditions.includes(trip)&&(trip.arriveAt<=now||!trip.arriveAt))resolveExpeditions();
  registerSites();update();
 }
 function kitchenClock(ms){const sec=Math.max(0,Math.ceil(ms/1000));return Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
@@ -767,6 +794,7 @@ function openFieldOrder(cell,action){
 }
 /* 0.15: real-time expedition completion while open and after reload. */
 function checkExpeditionClock(){
+ if(settleFounders(Date.now()))update();
  const due=state.expeditions.some(e=>e.arriveAt&&Date.now()>=e.arriveAt);
  if(due){resolveExpeditions();update();}
  if(activeTab==='world')worldCanvasDraw();
@@ -831,7 +859,7 @@ function reconcileJobs(){
   for(const [i,p] of ag.plots.entries()){
     const c=CROPS.find(c=>c.name===p.crop);
     if(!c||growth(p,c,now).remaining>0)continue;
-    if(ag.auto){harvestPlot(i);changed=true}
+    if(ag.auto&&farmer()){harvestPlot(i);changed=true}
     else if(p.progress!==c.days){p.progress=c.days;changed=true}
   }
   if(activeTab==='farm'&&!$('farmBeds').hidden&&!changed){
@@ -842,7 +870,7 @@ function reconcileJobs(){
       row.querySelector('.progress i').style.width=100*g.progress+'%';
     }
   }
-  if(nt.auto&&ck.queue.length<5&&availableMeals().reduce((n,m)=>n+m.qty,0)+ck.queue.length<nt.target){
+  if(localResidents().length&&nt.auto&&ck.queue.length<5&&availableMeals().reduce((n,m)=>n+m.qty,0)+ck.queue.length<nt.target){
     const r=RECIPES.find(canCook);if(r)cookRecipe(RECIPES.indexOf(r));
   }
   for(const timer of document.querySelectorAll('[data-end]')){
@@ -862,3 +890,15 @@ const scene=new Shelter(()=>({state,preview,zoom,panX,panY}),art);
 const resolution=Math.min(3,Math.max(1,Math.ceil(C.getBoundingClientRect().width*(devicePixelRatio||1)/800)));
 new Phaser.Game({type:Phaser.CANVAS,canvas:C,width:800*resolution,height:640*resolution,backgroundColor:'#24342c',scene,scale:{mode:Phaser.Scale.NONE,autoRound:false},banner:false});
 C.style.removeProperty('width');C.style.removeProperty('height');
+
+function blockEmptyOrders(event){
+ if(localResidents().length)return;
+ const el=event.target.closest('button,select,input');if(!el)return;
+ const navigation=el.closest('.shelterDock,.objectTabs,.farmTabs,.ktabs,.worldcontrols,.worldOrders,.cellWheel,#buildingWheel,.zoom')||['returnBase','kBack','selectMap','cancel','buildCatalogBack','chooseWorldCell'].includes(el.id)||el.closest('form[method=dialog]');
+ if(el.closest('.objectHead')||el.closest('#objectPanel')&&el.textContent.includes('Сведения'))return;
+ if(navigation && el.textContent!=='Ускорить' && el.id!=='buildMap')return;
+ const mutation=el.closest('#agriculture,#nutrition,#kitchenScreen,#buildCatalog,#objectPanel,#placement,#fieldOrder,.expeditions,#story,.worldOrders,#buildingWheel,.cellWheel')||['buildMap','attack','reset'].includes(el.id);
+ if(mutation){event.preventDefault();event.stopImmediatePropagation();msg('В убежище нет жителей.')}
+}
+document.addEventListener('click',blockEmptyOrders,true);
+document.addEventListener('change',blockEmptyOrders,true);
