@@ -1,0 +1,18 @@
+{
+  "name": "last-stand",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "node --experimental-strip-types --test shared/placement.test.ts"
+  },
+  "dependencies": {
+    "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "typescript": "~5.9.3",
+    "vite": "^7.0.0"
+  }
+}
